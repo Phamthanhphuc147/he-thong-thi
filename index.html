@@ -24,15 +24,18 @@
         input[type="text"], input[type="number"], input[type="password"], textarea { width: 100%; padding: 12px 15px; margin-bottom: 12px; border: 1px solid var(--border-color); border-radius: 8px; font-family: inherit; font-size: 15px; color: var(--text-main); background: var(--bg-input); }
         .btn { background: var(--primary); color: white; border: none; padding: 14px 24px; font-size: 16px; font-weight: 700; border-radius: 8px; cursor: pointer; display: inline-flex; gap: 8px; align-items: center; justify-content: center; width: 100%; transition: 0.2s;}
         .btn:hover { background: var(--primary-hover); transform: translateY(-2px); }
+        .btn:disabled { background: #9ca3af; cursor: not-allowed; transform: none; }
         .btn-success { background: var(--correct); } .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
         .upload-area { border: 2px dashed #93c5fd; padding: 50px 20px; text-align: center; border-radius: var(--radius); cursor: pointer; background: #eff6ff; margin-bottom: 15px; }
         .upload-area i { font-size: 50px; color: var(--primary); margin-bottom: 15px; }
         
+        /* Hiệu ứng 7 màu Welcome */
         #welcomeScreen { position: fixed; inset: 0; background: #111827; z-index: 99999; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: opacity 0.5s ease; }
         .rainbow-text { background-image: linear-gradient(270deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3); background-size: 400% 400%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: rgb-glow 3s ease infinite; font-weight: 900; font-size: 45px; text-align: center; text-transform: uppercase; padding: 0 20px; }
         @keyframes rgb-glow { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
         .dev-subtitle { color: #9ca3af; font-size: 18px; margin-top: 15px; letter-spacing: 2px; }
 
+        /* Auth UI */
         #authOverlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index: 20000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
         .auth-card { background: var(--bg-card); padding: 40px; border-radius: 20px; width: 90%; max-width: 400px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); text-align: center; }
         .auth-toggle { color: var(--primary); cursor: pointer; font-weight: bold; text-decoration: underline; }
@@ -40,10 +43,9 @@
 
         #screen-setup, #screen-preview, #screen-exam, #screen-result, #loadingOverlay { display: none; }
         
-        /* Chỉnh sửa thủ công UI */
+        /* Preview UI */
         .preview-section { font-size: 20px; color: var(--primary); font-weight: 900; margin: 25px 0 10px; border-bottom: 3px solid var(--primary); padding-bottom: 5px; }
         .preview-mcq { border: 1px solid #e5e7eb; padding: 15px; border-radius: 8px; margin-bottom: 15px; background: #f9fafb; transition: 0.3s; }
-        .preview-mcq:hover { border-color: #93c5fd; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
         .opt-row { display: flex; align-items: center; gap: 10px; margin-top: 8px; padding: 5px; border-radius: 5px; }
         .opt-row.is-correct-row { background: #d1fae5; border: 1px solid #10b981; }
     </style>
@@ -57,7 +59,7 @@
 
     <div class="container" id="userInfoBar">
         <div><i class="fa-solid fa-user-ninja"></i> Xin chào, <b id="userEmailDisplay" style="color: var(--primary);">Dev</b></div>
-        <button class="btn btn-outline" style="width: auto; padding: 8px 15px; font-size: 14px;" id="btnLogout"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</button>
+        <button class="btn btn-outline" style="width: auto; padding: 8px 15px; font-size: 14px;" id="btnLogout">Đăng xuất</button>
     </div>
 
     <div id="authOverlay">
@@ -80,7 +82,7 @@
 
     <div id="loadingOverlay" style="position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index: 30000; flex-direction: column; align-items: center; justify-content: center; color: white;">
         <i class="fa-solid fa-brain fa-fade" style="font-size: 60px; color: #a855f7; margin-bottom: 20px;"></i>
-        <h3 style="color: #a855f7; text-align: center; max-width: 80%;" id="loadingText">AI đang quét cấu trúc và định dạng đề...<br><small style="color: #d1d5db; font-weight: normal;">(Nhận diện Phần, Câu và In đậm/Gạch chân đáp án)</small></h3>
+        <h3 style="color: #a855f7; text-align: center; max-width: 80%;" id="loadingText">AI đang quét cấu trúc đề...</h3>
     </div>
 
     <div class="container">
@@ -88,44 +90,38 @@
             <h2 style="text-align: center;"><i class="fa-solid fa-wand-magic-sparkles"></i> Trình Tạo Đề AI Đỉnh Cao</h2>
             <div class="upload-area" onclick="document.getElementById('fileUpload').click()">
                 <i class="fa-solid fa-file-word"></i>
-                <h3 id="fileName">Tải file Word (.docx) lên đây</h3>
-                <p style="color: var(--text-muted);">Hệ thống nhận diện tự động cấu trúc PHẦN, CÂU và <b>In đậm</b>, <u>Gạch chân</u> để đánh dấu đáp án.</p>
-                <input type="file" id="fileUpload" accept=".docx" style="display: none;">
+                <h3 id="fileNameDisplay">Tải file Word (.docx) lên đây</h3>
+                <input type="file" id="fileUpload" accept=".docx" style="display: none;" onchange="document.getElementById('fileNameDisplay').innerText = this.files[0].name">
             </div>
             <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 15px;">
                 <div><label>Tên bài thi:</label><input type="text" id="examName" placeholder="VD: Đề Toán Khảo Sát"></div>
                 <div><label>Thời gian (phút):</label><input type="number" id="examTime" value="45"></div>
             </div>
-            <button class="btn" style="background: linear-gradient(90deg, #3b82f6, #8b5cf6); border: none; font-size: 18px; padding: 18px;" onclick="processDocx()">QUÉT BẰNG AI GEMINI <i class="fa-solid fa-rocket"></i></button>
+            <button class="btn" style="background: linear-gradient(90deg, #3b82f6, #8b5cf6);" onclick="processDocx()">QUÉT BẰNG AI GEMINI <i class="fa-solid fa-rocket"></i></button>
         </div>
 
         <div id="screen-preview" class="card">
-            <h2><i class="fa-solid fa-user-pen"></i> Kiểm tra & Chỉnh sửa thủ công</h2>
-            <p style="color: var(--text-muted);"><i class="fa-solid fa-circle-check" style="color: var(--correct);"></i> Kiểm tra lại nội dung AI vừa bóc tách. Chọn vào nút Radio (Tròn) để đổi đáp án đúng nếu AI nhận diện sai.</p>
-            <div id="previewContainer" style="max-height: 650px; overflow-y: auto; padding-right: 10px;"></div>
-            <button class="btn btn-success" style="margin-top: 20px;" id="btnSaveToDatabase">
-                <i class="fa-solid fa-cloud-arrow-up"></i> LƯU VÀO DATABASE & LẤY LINK CHIA SẺ
-            </button>
+            <h2><i class="fa-solid fa-user-pen"></i> Kiểm tra & Chỉnh sửa</h2>
+            <div id="previewContainer" style="max-height: 600px; overflow-y: auto;"></div>
+            <button class="btn btn-success" id="btnSaveToDatabase" style="margin-top:20px;">LƯU VÀO DATABASE</button>
             <div id="shareLinkArea" style="display: none; margin-top: 20px;">
-                <label style="color: var(--primary);"><b>🎉 Link chia sẻ trực tiếp:</b></label>
-                <input type="text" id="shareLink" readonly style="margin-top:10px; font-weight: bold; color: var(--primary);">
-                <button class="btn btn-outline" onclick="copyLink()"><i class="fa-regular fa-copy"></i> Copy Link</button>
+                <input type="text" id="shareLink" readonly>
+                <button class="btn btn-outline" onclick="copyLink()">Copy Link</button>
             </div>
         </div>
 
-        <div id="screen-exam">
-            <div class="exam-main card" id="quizRender" style="margin-bottom: 0; max-height: 80vh; overflow-y: auto;"></div>
-            <div style="width: 300px; position: sticky; top: 20px; flex-shrink: 0;" class="card">
-                <h2 style="text-align: center; color: var(--wrong); font-size: 36px; margin-bottom: 20px;" id="timerDisplay">00:00</h2>
-                <button class="btn" onclick="submitTest()"><i class="fa-solid fa-paper-plane"></i> NỘP BÀI</button>
+        <div id="screen-exam" style="display:none; gap: 20px;">
+            <div id="quizRender" class="card" style="flex: 1;"></div>
+            <div class="card" style="width: 250px; position: sticky; top: 20px; height: fit-content; text-align: center;">
+                <h2 id="timerDisplay" style="color: var(--wrong); font-size: 40px;">00:00</h2>
+                <button class="btn" onclick="submitTest()">NỘP BÀI</button>
             </div>
         </div>
 
         <div id="screen-result" class="card" style="text-align: center;">
-            <h2>ĐÁNH GIÁ NĂNG LỰC</h2>
-            <h1 style="font-size: 80px; color: var(--correct); margin: 20px 0;" id="finalScore">10</h1>
-            <p style="font-weight: bold; color: var(--text-muted); font-size: 18px;">HỆ THỐNG AZOTA CLONE BỞI TH4NHPHVC</p>
-            <button class="btn" style="width: auto; margin-top: 20px;" onclick="window.location.href=window.location.pathname"><i class="fa-solid fa-home"></i> Về trang chủ</button>
+            <h1>ĐIỂM SỐ CỦA BẠN</h1>
+            <h1 id="finalScore" style="font-size: 100px; color: var(--correct);">0</h1>
+            <button class="btn" onclick="location.reload()">LÀM ĐỀ KHÁC</button>
         </div>
     </div>
 
@@ -134,7 +130,6 @@
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // Firebase Config của TH4NHPHVC
         const firebaseConfig = {
             apiKey: "AIzaSyAGk0pgSXDviwxbqnLMiUL43-qwZUX87eY",
             authDomain: "tracnghiemaz.firebaseapp.com",
@@ -151,208 +146,184 @@
         let isLoginMode = true; let isCaptchaSolved = false; let currentUser = null;
         let rawData = { title: "", time: 45, items: [] };
 
-        setTimeout(() => {
-            let ws = document.getElementById('welcomeScreen');
-            ws.style.opacity = '0'; setTimeout(() => ws.style.display = 'none', 500);
-        }, 2500);
+        // Welcome screen
+        setTimeout(() => { document.getElementById('welcomeScreen').style.opacity = '0'; setTimeout(()=>document.getElementById('welcomeScreen').style.display='none',500); }, 2500);
 
-        // --- BƯỚC 1: LẤY MÃ HTML ĐỂ GIỮ NGUYÊN IN ĐẬM/GẠCH CHÂN ---
+        // --- AUTH LOGIC ---
+        window.captchaSolved = function() { isCaptchaSolved = true; document.getElementById('btnSubmitAuth').disabled = false; };
+        
+        document.getElementById('btnSwitchAuth').onclick = () => {
+            isLoginMode = !isLoginMode;
+            document.getElementById('authTitle').innerText = isLoginMode ? 'Đăng Nhập Hệ Thống' : 'Tạo Tài Khoản Mới';
+            document.getElementById('btnSubmitAuth').innerText = isLoginMode ? 'BẮT ĐẦU' : 'ĐĂNG KÝ NGAY';
+            document.getElementById('btnSwitchAuth').innerText = isLoginMode ? 'Đăng ký ngay' : 'Đăng nhập';
+        };
+
+        document.getElementById('btnSubmitAuth').onclick = async () => {
+            const email = document.getElementById('authEmail').value;
+            const pass = document.getElementById('authPassword').value;
+            const errorEl = document.getElementById('authError');
+            if (!isCaptchaSolved) return alert("Vui lòng xác minh Captcha!");
+            
+            document.getElementById('btnSubmitAuth').innerText = "Đang xử lý...";
+            try {
+                if (isLoginMode) { await signInWithEmailAndPassword(auth, email, pass); }
+                else { await createUserWithEmailAndPassword(auth, email, pass); alert("Đăng ký thành công!"); }
+            } catch (e) {
+                console.error(e);
+                errorEl.innerText = "Lỗi: " + e.message;
+                errorEl.style.display = 'block';
+                document.getElementById('btnSubmitAuth').innerText = "THỬ LẠI";
+            }
+        };
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('authOverlay').style.display = 'none';
+                document.getElementById('userInfoBar').style.display = 'flex';
+                document.getElementById('userEmailDisplay').innerText = user.email;
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.get('id')) { loadExamFromDatabase(urlParams.get('id')); } 
+                else { document.getElementById('screen-setup').style.display = 'block'; }
+            } else {
+                document.getElementById('authOverlay').style.display = 'flex';
+                document.getElementById('userInfoBar').style.display = 'none';
+                document.getElementById('screen-setup').style.display = 'none';
+            }
+        });
+
+        document.getElementById('btnLogout').onclick = () => signOut(auth);
+
+        // --- AI & DOCX LOGIC ---
         window.processDocx = function() {
             let file = document.getElementById('fileUpload').files[0];
-            if (!file) return alert("Vui lòng chọn file Word!");
-            rawData.title = document.getElementById('examName').value || "Đề thi AI";
+            if (!file) return alert("Chọn file Word!");
+            rawData.title = document.getElementById('examName').value || "Đề thi mới";
             rawData.time = parseInt(document.getElementById('examTime').value) || 45;
 
             document.getElementById('loadingOverlay').style.display = 'flex';
-            document.getElementById('loadingText').innerHTML = 'AI đang đọc cấu trúc và tìm đáp án in đậm...<br><small style="color: #d1d5db; font-weight: normal;">(Xin chờ giây lát)</small>';
-            
             let reader = new FileReader();
             reader.onload = function(e) {
-                // CHÚ Ý: Dùng convertToHtml để giữ lại <b>, <u> cho AI đọc
-                mammoth.convertToHtml({arrayBuffer: e.target.result}, { styleMap: ["b => b", "strong => b", "u => u"] })
-                .then(result => {
-                    let htmlText = result.value;
-                    goiAIBocTach(htmlText); 
-                }).catch(() => { document.getElementById('loadingOverlay').style.display = 'none'; alert("Lỗi đọc file Word!"); });
+                mammoth.convertToHtml({arrayBuffer: e.target.result}, { styleMap: ["b => b", "u => u"] })
+                .then(result => goiAIBocTach(result.value))
+                .catch(err => alert("Lỗi đọc file!"));
             };
             reader.readAsArrayBuffer(file);
-        }
+        };
 
-        // --- BƯỚC 2: GỬI HTML LÊN MÁY CHỦ API CỦA VERCEL ---
-        async function goiAIBocTach(textHtml) {
+        async function goiAIBocTach(html) {
             try {
-                const response = await fetch('/api/tach-de', {
+                const res = await fetch('/api/tach-de', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ textHtml: textHtml })
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ textHtml: html })
                 });
-                
-                if (!response.ok) throw new Error("Máy chủ Backend chưa phản hồi. (Chưa up lên Vercel?)");
-                
-                const dataJson = await response.json();
-                if(dataJson.error) throw new Error(dataJson.error);
-
-                rawData.items = dataJson;
+                const data = await res.json();
+                rawData.items = data;
                 showPreview();
-                
-            } catch (error) {
-                alert("Lỗi hệ thống: " + error.message);
-            } finally {
-                document.getElementById('loadingOverlay').style.display = 'none';
-            }
+            } catch (e) { alert("Lỗi kết nối AI!"); }
+            finally { document.getElementById('loadingOverlay').style.display = 'none'; }
         }
 
-        // --- BƯỚC 3: GIAO DIỆN CHỈNH SỬA THỦ CÔNG ---
-        // Hàm cập nhật màu nền khi click chọn đáp án đúng
-        window.updateCorrectRow = function(questionIndex, selectedRadio) {
-            let optionsRows = document.querySelectorAll(`.opt-group-${questionIndex} .opt-row`);
-            optionsRows.forEach(row => row.classList.remove('is-correct-row'));
-            selectedRadio.closest('.opt-row').classList.add('is-correct-row');
+        window.updateRowColor = (idx, radio) => {
+            document.querySelectorAll(`.opt-group-${idx} .opt-row`).forEach(r => r.classList.remove('is-correct-row'));
+            radio.closest('.opt-row').classList.add('is-correct-row');
         };
 
         function showPreview() {
             document.getElementById('screen-setup').style.display = 'none';
             document.getElementById('screen-preview').style.display = 'block';
-            
-            let htmlBuffer = ''; 
-            rawData.items.forEach((item, i) => {
-                if (item.type === 'section') {
-                    // In ra cấu trúc PHẦN
-                    htmlBuffer += `<div class="preview-section"><i class="fa-solid fa-bookmark"></i> <input type="text" id="sec-${i}" value="${item.text.replace(/"/g, '&quot;')}" style="font-weight:900; font-size:18px; color:inherit; border:none; background:transparent; margin:0; padding:0; outline:none; width:80%;"></div>`;
-                } else if (item.type === 'mcq') {
-                    // In ra CÂU HỎI
-                    htmlBuffer += `<div class="preview-mcq">
-                    <textarea id="eq-${i}" style="font-weight:bold; border:none; background:transparent; width:100%; resize:vertical; min-height:50px;">${item.text}</textarea>
-                    <div class="opt-group-${i}">`;
-                    
-                    item.options.forEach((opt, j) => { 
-                        let correctClass = opt.isCorrect ? 'is-correct-row' : '';
-                        htmlBuffer += `<div class="opt-row ${correctClass}">
-                        <input type="radio" name="em-${i}" ${opt.isCorrect?'checked':''} id="em-r-${i}-${j}" onchange="updateCorrectRow(${i}, this)" style="cursor:pointer; transform:scale(1.2);">
-                        <b style="width:25px">${opt.label}.</b>
-                        <input type="text" id="em-t-${i}-${j}" value="${opt.text.replace(/"/g, '&quot;')}" style="margin:0; background:transparent; border:none; border-bottom:1px solid transparent; transition:0.2s;" onfocus="this.style.borderBottom='1px solid var(--primary)'" onblur="this.style.borderBottom='1px solid transparent'"></div>`; 
-                    });
-                    htmlBuffer += `</div></div>`;
-                }
-            });
-            document.getElementById('previewContainer').innerHTML = htmlBuffer;
-        }
-
-        // --- BƯỚC 4: LƯU VÀO FIREBASE KHI ĐÃ CHỈNH SỬA XONG ---
-        document.getElementById('btnSaveToDatabase').addEventListener('click', async () => {
-            document.getElementById('loadingOverlay').style.display = 'flex';
-            document.getElementById('loadingText').innerText = "Đang mã hóa và lưu trữ lên Firebase...";
-            
-            // Cập nhật lại những chỉnh sửa thủ công của người dùng
-            rawData.items.forEach((item, i) => {
-                if (item.type === 'section') {
-                    item.text = document.getElementById(`sec-${i}`).value;
-                } else if (item.type === 'mcq') {
-                    item.text = document.getElementById(`eq-${i}`).value;
-                    item.options.forEach((opt, j) => { 
-                        opt.text = document.getElementById(`em-t-${i}-${j}`).value; 
-                        opt.isCorrect = document.getElementById(`em-r-${i}-${j}`).checked; // Cập nhật lại radio mới nhất
-                    });
-                }
-            });
-
-            try {
-                const docRef = await addDoc(collection(db, "exams"), {
-                    title: rawData.title, time: rawData.time, items: rawData.items, authorId: currentUser.uid, createdAt: new Date()
-                });
-                let shortLink = window.location.href.split('?')[0] + '?id=' + docRef.id;
-                document.getElementById('shareLink').value = shortLink;
-                document.getElementById('shareLinkArea').style.display = 'block';
-                document.getElementById('btnSaveToDatabase').style.display = 'none';
-                window.scrollTo(0, document.body.scrollHeight);
-            } catch (e) { alert("Lỗi Firebase: " + e.message); } 
-            finally { document.getElementById('loadingOverlay').style.display = 'none'; }
-        });
-
-        window.copyLink = function() { document.getElementById('shareLink').select(); document.execCommand('copy'); alert("Đã copy Link!"); }
-
-        // --- BƯỚC 5: LÀM BÀI THI & CHẤM ĐIỂM ---
-        async function loadExamFromDatabase(examId) {
-            document.getElementById('loadingOverlay').style.display = 'flex';
-            document.getElementById('loadingText').innerText = "Đang kết nối kho dữ liệu...";
-            try {
-                const docSnap = await getDoc(doc(db, "exams", examId));
-                if (docSnap.exists()) { rawData = docSnap.data(); document.getElementById('screen-setup').style.display = 'none'; startTest(); } 
-                else { alert("Không tìm thấy đề thi này!"); }
-            } catch (error) { alert("Lỗi: " + error.message); } 
-            finally { document.getElementById('loadingOverlay').style.display = 'none'; }
-        }
-
-        let timer, timeLeft, userAns={};
-        function startTest() {
-            document.getElementById('screen-exam').style.display = 'flex';
-            let htmlBuffer = `<h2>${rawData.title}</h2><hr style="margin-bottom:20px;">`;
-            
+            let html = '';
             rawData.items.forEach((item, i) => {
                 if(item.type === 'section') {
-                    htmlBuffer += `<h3 style="margin-top: 30px; margin-bottom: 15px; color: var(--primary); text-transform: uppercase;"><i class="fa-solid fa-bookmark"></i> ${item.text}</h3>`;
-                } else if (item.type === 'mcq') {
-                    htmlBuffer += `<div style="margin-bottom:25px; padding:20px; border:1px solid #e5e7eb; border-radius:12px; background:white; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
-                    <b style="font-size:16px;">${item.text}</b><div style="margin-top:15px; display:flex; flex-direction:column; gap:10px;">`;
-                    item.options.forEach((opt, j) => { 
-                        htmlBuffer += `<label style="padding:10px 15px; border:1px solid #e5e7eb; border-radius:8px; cursor:pointer; transition:0.2s;" onmouseover="this.style.background='#eff6ff'" onmouseout="this.style.background='transparent'">
-                        <input type="radio" name="q${i}" onchange="userAns[${i}]=${j}" style="transform:scale(1.2); margin-right:10px;"> <b>${opt.label}.</b> ${opt.text}</label>`; 
+                    html += `<div class="preview-section"><input type="text" id="sec-${i}" value="${item.text}"></div>`;
+                } else {
+                    html += `<div class="preview-mcq">
+                        <textarea id="eq-${i}">${item.text}</textarea>
+                        <div class="opt-group-${i}">`;
+                    item.options.forEach((opt, j) => {
+                        html += `<div class="opt-row ${opt.isCorrect?'is-correct-row':''}">
+                            <input type="radio" name="r-${i}" ${opt.isCorrect?'checked':''} id="r-${i}-${j}" onchange="updateRowColor(${i}, this)">
+                            <b>${opt.label}.</b> <input type="text" id="t-${i}-${j}" value="${opt.text}">
+                        </div>`;
                     });
-                    htmlBuffer += `</div></div>`;
+                    html += `</div></div>`;
                 }
             });
-            document.getElementById('quizRender').innerHTML = htmlBuffer;
+            document.getElementById('previewContainer').innerHTML = html;
+        }
+
+        document.getElementById('btnSaveToDatabase').onclick = async () => {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            rawData.items.forEach((item, i) => {
+                if(item.type === 'section') item.text = document.getElementById(`sec-${i}`).value;
+                else {
+                    item.text = document.getElementById(`eq-${i}`).value;
+                    item.options.forEach((opt, j) => {
+                        opt.text = document.getElementById(`t-${i}-${j}`).value;
+                        opt.isCorrect = document.getElementById(`r-${i}-${j}`).checked;
+                    });
+                }
+            });
+            try {
+                const docRef = await addDoc(collection(db, "exams"), { ...rawData, author: currentUser.uid, date: new Date() });
+                document.getElementById('shareLink').value = window.location.origin + "?id=" + docRef.id;
+                document.getElementById('shareLinkArea').style.display = 'block';
+            } catch (e) { alert("Lỗi lưu DB!"); }
+            finally { document.getElementById('loadingOverlay').style.display = 'none'; }
+        };
+
+        // --- EXAM LOGIC ---
+        let timer, timeLeft, userAns = {};
+        async function loadExamFromDatabase(id) {
+            const docSnap = await getDoc(doc(db, "exams", id));
+            if (docSnap.exists()) { 
+                rawData = docSnap.data(); 
+                document.getElementById('screen-setup').style.display = 'none'; 
+                startTest(); 
+            }
+        }
+
+        function startTest() {
+            document.getElementById('screen-exam').style.display = 'flex';
+            let html = `<h2>${rawData.title}</h2>`;
+            rawData.items.forEach((item, i) => {
+                if(item.type === 'section') html += `<h3 class="preview-section">${item.text}</h3>`;
+                else {
+                    html += `<div class="card"><b>${item.text}</b><br>`;
+                    item.options.forEach((opt, j) => {
+                        html += `<label style="display:block; margin:10px 0;"><input type="radio" name="q-${i}" onchange="userAns[${i}]=${j}"> ${opt.label}. ${opt.text}</label>`;
+                    });
+                    html += `</div>`;
+                }
+            });
+            document.getElementById('quizRender').innerHTML = html;
             timeLeft = rawData.time * 60;
-            timer = setInterval(() => { timeLeft--; let m = Math.floor(timeLeft/60).toString().padStart(2,'0'); let s = (timeLeft%60).toString().padStart(2,'0'); document.getElementById('timerDisplay').innerText = `${m}:${s}`; if(timeLeft<=0) { clearInterval(timer); submitTest(); } }, 1000);
+            timer = setInterval(() => {
+                let m = Math.floor(timeLeft/60), s = timeLeft%60;
+                document.getElementById('timerDisplay').innerText = `${m}:${s<10?'0'+s:s}`;
+                if(--timeLeft < 0) submitTest();
+            }, 1000);
         }
 
         window.submitTest = function() {
-            clearInterval(timer); let score=0, totalMcq=0;
-            rawData.items.forEach((item, i) => { 
+            clearInterval(timer);
+            let score = 0, total = 0;
+            rawData.items.forEach((item, i) => {
                 if(item.type === 'mcq') {
-                    totalMcq++;
-                    let trueIdx = item.options.findIndex(o=>o.isCorrect); 
-                    if (userAns[i] === trueIdx) score++; 
+                    total++;
+                    let correctIdx = item.options.findIndex(o => o.isCorrect);
+                    if(userAns[i] === correctIdx) score++;
                 }
             });
-            document.getElementById('screen-exam').style.display = 'none'; document.getElementById('screen-result').style.display = 'block';
-            document.getElementById('finalScore').innerText = totalMcq > 0 ? ((score/totalMcq)*10).toFixed(2) : "0";
-            confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
-        }
-
-        // Firebase Auth Logic (Giữ nguyên)
-        window.captchaSolved = function(token) { isCaptchaSolved = true; document.getElementById('btnSubmitAuth').disabled = false; }
-        document.getElementById('btnSwitchAuth').addEventListener('click', () => {
-            isLoginMode = !isLoginMode;
-            document.getElementById('authTitle').innerHTML = isLoginMode ? '<i class="fa-solid fa-shield-halved"></i> Đăng Nhập Hệ Thống' : '<i class="fa-solid fa-user-plus"></i> Tạo Tài Khoản Mới';
-            document.getElementById('btnSubmitAuth').innerText = isLoginMode ? 'ĐĂNG NHẬP' : 'ĐĂNG KÝ';
-            document.getElementById('authSwitchText').innerText = isLoginMode ? 'Chưa có tài khoản?' : 'Đã có tài khoản?';
-            document.getElementById('btnSwitchAuth').innerText = isLoginMode ? 'Đăng ký ngay' : 'Đăng nhập';
-            document.getElementById('authError').style.display = 'none';
-        });
-
-        document.getElementById('btnSubmitAuth').addEventListener('click', () => {
-            if(!isCaptchaSolved) return alert("Vui lòng xác minh Captcha!");
-            let email = document.getElementById('authEmail').value; let pass = document.getElementById('authPassword').value; let errorEl = document.getElementById('authError');
-            document.getElementById('btnSubmitAuth').innerText = "Đang xử lý...";
-            if (isLoginMode) {
-                signInWithEmailAndPassword(auth, email, pass).then(() => { document.getElementById('authOverlay').style.display = 'none'; }).catch(err => { errorEl.innerText = "Sai email hoặc mật khẩu!"; errorEl.style.display = 'block'; document.getElementById('btnSubmitAuth').innerText = "ĐĂNG NHẬP"; });
-            } else {
-                createUserWithEmailAndPassword(auth, email, pass).then(() => { document.getElementById('authOverlay').style.display = 'none'; alert("Đăng ký thành công!"); }).catch(err => { errorEl.innerText = err.message.includes('email-already') ? "Email này đã tồn tại!" : "Lỗi: Mật khẩu quá yếu (cần 6 ký tự)."; errorEl.style.display = 'block'; document.getElementById('btnSubmitAuth').innerText = "ĐĂNG KÝ"; });
-            }
-        });
-
-        document.getElementById('btnLogout').addEventListener('click', () => { signOut(auth); });
-
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                currentUser = user; document.getElementById('authOverlay').style.display = 'none'; document.getElementById('userInfoBar').style.display = 'flex'; document.getElementById('userEmailDisplay').innerText = user.email;
-                const urlParams = new URLSearchParams(window.location.search); const examId = urlParams.get('id');
-                if (examId) { loadExamFromDatabase(examId); } else { document.getElementById('screen-setup').style.display = 'block'; }
-            } else {
-                currentUser = null; document.getElementById('authOverlay').style.display = 'flex'; document.getElementById('userInfoBar').style.display = 'none'; document.getElementById('screen-setup').style.display = 'none';
-            }
-        });
+            document.getElementById('screen-exam').style.display = 'none';
+            document.getElementById('screen-result').style.display = 'block';
+            document.getElementById('finalScore').innerText = ((score/total)*10).toFixed(2);
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+        };
+        
+        window.copyLink = () => { document.getElementById('shareLink').select(); document.execCommand('copy'); alert("Đã copy!"); };
     </script>
 </body>
 </html>
