@@ -123,8 +123,8 @@
         </div>
 
         <div id="screen-setup" class="app-screen card">
-            <h2 style="text-align: center; font-size: 32px;">Trình Bóc Tách Đề 6.0</h2>
-            <p style="text-align: center; color: var(--text-muted); margin-bottom: 30px; font-weight: 600;">Tự động nhận diện Đáp án In đậm, gạch chân và format câu Đúng/Sai.</p>
+            <h2 style="text-align: center; font-size: 32px;">Trình Bóc Tách Đề 6.1</h2>
+            <p style="text-align: center; color: var(--text-muted); margin-bottom: 30px; font-weight: 600;">Động cơ chặt dòng siêu việt: Bất chấp lỗi Enter của giáo viên.</p>
             
             <div class="upload-area" onclick="document.getElementById('fileUpload').click()">
                 <i class="fa-solid fa-file-word"></i>
@@ -229,7 +229,7 @@
         let rawData = { title: "", time: 45, items: [] };
         let currentExamId = null; let tempRawHtml = ""; 
 
-        // THÔNG BÁO RGB TH4NHPHVCD3V KHI MỚI VÀO TRANG (Chỉ báo 1 lần)
+        // THÔNG BÁO RGB TH4NHPHVCD3V
         if (!sessionStorage.getItem('rgbNotified')) {
             Swal.fire({
                 html: `<div class="rgb-text-fx">TH4NHPHVCD3V</div>
@@ -248,29 +248,31 @@
             window.scrollTo(0,0);
         };
 
-        // --- ĐỘNG CƠ 6.0: SỬA LỖI MẤT IN ĐẬM + NHẬN DIỆN T/F ---
+        // --- ĐỘNG CƠ 6.1: BẺ DÒNG THẦN THÁNH, FIX LỖI "KHÔNG TÌM THẤY CÂU 1" ---
         function parseWordToExamRaw(htmlString) {
             let items = [];
             
-            // 1. Convert In đậm/Gạch chân thành Text tàng hình để không bị mất
+            // 1. Chuyển thẻ HTML thành tag Azota tàng hình
             let processedHtml = htmlString
-                .replace(/<strong>(.*?)<\/strong>/gi, ' [!b:$1$] ')
-                .replace(/<b>(.*?)<\/b>/gi, ' [!b:$1$] ')
-                .replace(/<u>(.*?)<\/u>/gi, ' [!u:$1$] ')
-                .replace(/<\/p>/gi, '\n')
+                .replace(/<strong[^>]*>(.*?)<\/strong>/gi, ' [!b:$1$] ')
+                .replace(/<b[^>]*>(.*?)<\/b>/gi, ' [!b:$1$] ')
+                .replace(/<u[^>]*>(.*?)<\/u>/gi, ' [!u:$1$] ')
+                // QUAN TRỌNG: Ép các thẻ khối thành dấu xuống dòng
+                .replace(/<\/(p|div|h[1-6]|li|tr)>/gi, '\n')
                 .replace(/<br\s*\/?>/gi, '\n');
 
             let tempDiv = document.createElement('div');
             tempDiv.innerHTML = processedHtml;
             let rawText = tempDiv.textContent || tempDiv.innerText;
 
-            // Xóa rác ZWSP
-            let cleanText = rawText.replace(/[\u200B-\u200D\uFEFF]/g, '');
+            // Xóa ký tự tàng hình gây kẹt Regex
+            rawText = rawText.replace(/[\u200B-\u200D\uFEFF]/g, '');
 
-            // Bẻ dòng MCQ: A. B. C. D.
-            cleanText = cleanText.replace(/(\s+)(\*?\s*(?:\[![bu]:\$)?\s*[A-D][\.\:\)](?:\$\])?)/gi, '\n$2');
-            // Bẻ dòng T/F: a) b) c) d)
-            cleanText = cleanText.replace(/(\s+)(\*?\s*(?:\[![bu]:\$)?\s*[a-d]\)(?:\$\])?)/gi, '\n$2');
+            // BẺ DÒNG BẠO CHÚA: Tự động chèn Enter trước Câu, A. B., a) b)
+            let cleanText = rawText
+                .replace(/(\s*)(Câu\s*\d+[\:\.])/gi, '\n$2') // Ép xuống dòng trước Câu X
+                .replace(/(\s+)(\*?\s*(?:\[![bu]:\$)?\s*[A-D][\.\:\)](?:\$\])?)/gi, '\n$2') // Ép A. B.
+                .replace(/(\s+)(\*?\s*(?:\[![bu]:\$)?\s*[a-d]\)(?:\$\])?)/gi, '\n$2'); // Ép a) b)
 
             let lines = cleanText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
             let currentItem = null;
@@ -283,42 +285,39 @@
                     currentItem = null; continue;
                 }
 
+                // Chấp nhận Câu 1, Câu 1:, Bài 1, Question 1
                 if (/^(Câu|Bài|Question)\s*\d+/i.test(testLine)) {
                     if (currentItem) items.push(currentItem);
                     currentItem = { type: 'mcq', text: line, options: [] }; 
                     continue;
                 }
 
-                // Match dạng A. B. (MCQ) hoặc a) b) (T/F)
                 let optMatch = line.match(/^(\*?)\s*(?:\[![bu]:\$)?\s*([A-D][\.\:\)]|[a-d]\))(?:\$\])?\s*(.*)$/i);
                 
                 if (optMatch && currentItem) {
                     let isStarred = optMatch[1] === '*';
-                    let rawLabel = optMatch[2]; // VD: "A." hoặc "a)"
+                    let rawLabel = optMatch[2]; 
                     let label = rawLabel.replace(/[\.\:\)]/g, '').trim().toUpperCase();
                     let content = optMatch[3].trim();
                     let isCorrect = isStarred;
                     
-                    // Nếu là a) b) -> tự chuyển thành True/False
                     if (rawLabel.includes(')')) currentItem.type = 'tf';
 
-                    // Lọc Đ/S và In Đậm
                     let contentTest = content.replace(/\[![a-z]+:\$(.*?)\$\]/g, '$1').toUpperCase();
                     let tfState = ''; 
                     
                     if (contentTest.includes('(Đ)') || contentTest.includes('[Đ]') || contentTest.endsWith(' Đ') || /\[!b:\$Đ\$\]/i.test(content)) {
                         isCorrect = true; tfState = 'Đ';
                         content = content.replace(/\[!b:\$Đ\$\]|\(Đ\)|\[Đ\]| Đ$/gi, '').trim();
-                        currentItem.type = 'tf'; // Ép thành T/F
+                        currentItem.type = 'tf';
                     } else if (contentTest.includes('(S)') || contentTest.includes('[S]') || contentTest.endsWith(' S') || /\[!b:\$S\$\]/i.test(content)) {
                         isCorrect = false; tfState = 'S';
                         content = content.replace(/\[!b:\$S\$\]|\(S\)|\[S\]| S$/gi, '').trim();
                         currentItem.type = 'tf';
                     } else if (/\[![bu]:\$(.*?)\$\]/.test(content) || line.includes(`[!b:$${rawLabel}]`)) {
-                        isCorrect = true; tfState = 'Đ'; // Nếu bôi đậm câu trả lời -> ĐÚNG
+                        isCorrect = true; tfState = 'Đ';
                     }
 
-                    // T/F mặc định là Sai nếu không có dấu hiệu
                     if (currentItem.type === 'tf' && tfState === '') tfState = 'S';
 
                     content = content.replace(/\[![a-z]+:\$(.*?)\$\]/g, '$1').trim();
@@ -338,7 +337,7 @@
         document.getElementById('btnSwitchAuth').onclick = () => {
             isLoginMode = !isLoginMode;
             document.getElementById('authTitle').innerText = isLoginMode ? 'Đăng Nhập Hệ Thống' : 'Tạo Tài Khoản Mới';
-            document.getElementById('btnSubmitAuth').innerText = isLoginMode ? 'BẮT ĐẦU VÀO TRANG' : 'TẠO TÀI KHOẢN';
+            document.getElementById('btnSubmitAuth').innerText = isLoginMode ? 'ĐĂNG NHẬP' : 'ĐĂNG KÝ';
             document.getElementById('btnSwitchAuth').innerText = isLoginMode ? 'Đăng ký ngay' : 'Đăng nhập';
         };
 
@@ -403,7 +402,6 @@
 
             let reader = new FileReader();
             reader.onload = function(e) {
-                // CHÌA KHÓA: Dùng convertToHtml để bắt In đậm, sau đó truyền vào hàm xử lý Text
                 mammoth.convertToHtml({arrayBuffer: e.target.result}, { styleMap: ["b => b", "strong => b", "u => u"] })
                 .then(result => {
                     let extracted = parseWordToExamRaw(result.value);
