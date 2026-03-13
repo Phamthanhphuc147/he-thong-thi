@@ -1,3 +1,6 @@
+// Ép Vercel bản Free tăng thời gian chờ lên tối đa 60 giây (Chống sập server khi file nặng)
+export const maxDuration = 60; 
+
 export default async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
@@ -14,18 +17,18 @@ export default async function handler(req, res) {
         - Nếu là Văn bản/HTML: Chữ được In đậm (<b>, <strong>), Gạch chân (<u>), hoặc có MÀU SẮC khác biệt.
         - Nếu là Ảnh/PDF: Đáp án được khoanh tròn, đánh dấu tick, tô đậm, hoặc gạch dưới.
 
-        Cấu trúc mảng JSON bắt buộc (Không chứa Markdown ```json):
+        Cấu trúc mảng JSON bắt buộc (Không chứa Markdown \`\`\`json):
         [{"type": "mcq", "text": "Câu 1: Nội dung câu hỏi...", "options": [{"label": "A", "text": "Nội dung đáp án", "isCorrect": true/false}]}]
         
         Chỉ trả về JSON thuần túy, tuyệt đối không giải thích thêm.`;
 
         let parts = [];
         
-        // Nếu Frontend gửi lên chuỗi HTML từ file Word
+        // Nhận HTML từ file Word
         if (type === 'html') {
             parts = [{ text: prompt + "\n\nNỘI DUNG HTML:\n" + content }];
         } 
-        // Nếu Frontend gửi lên file PDF hoặc Ảnh (Base64)
+        // Nhận file PDF hoặc Ảnh (Base64)
         else if (type === 'media') {
             parts = [
                 { text: prompt },
@@ -41,13 +44,11 @@ export default async function handler(req, res) {
 
         const data = await response.json();
         
-        // Bắt lỗi từ Google
         if (data.error) throw new Error("Google AI Error: " + data.error.message);
         if (!data.candidates || !data.candidates[0].content) throw new Error("AI không trả về dữ liệu.");
 
         let aiText = data.candidates[0].content.parts[0].text;
         
-        // Bộ lọc Regex siêu sạch để tách chuỗi JSON
         const match = aiText.match(/\[[\s\S]*\]/);
         if (!match) throw new Error("AI không trả về đúng định dạng mảng JSON.");
 
