@@ -11,11 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700;900&display=swap" rel="stylesheet">
     
     <style>
-        :root {
-            --primary: #2563eb; --primary-hover: #1d4ed8; --bg-body: #f3f4f6; --bg-card: #ffffff;
-            --text-main: #1f2937; --text-muted: #6b7280; --border-color: #e5e7eb; --bg-input: #ffffff;
-            --correct: #10b981; --wrong: #ef4444; --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1); --radius: 12px;
-        }
+        :root { --primary: #2563eb; --primary-hover: #1d4ed8; --bg-body: #f3f4f6; --bg-card: #ffffff; --text-main: #1f2937; --text-muted: #6b7280; --border-color: #e5e7eb; --bg-input: #ffffff; --correct: #10b981; --wrong: #ef4444; --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1); --radius: 12px; }
         * { box-sizing: border-box; }
         body { font-family: 'Quicksand', sans-serif; background: var(--bg-body); color: var(--text-main); margin: 0; padding: 20px; line-height: 1.5; }
         .container { max-width: 1100px; margin: auto; position: relative; }
@@ -29,13 +25,11 @@
         .upload-area { border: 2px dashed #93c5fd; padding: 50px 20px; text-align: center; border-radius: var(--radius); cursor: pointer; background: #eff6ff; margin-bottom: 15px; }
         .upload-area i { font-size: 50px; color: var(--primary); margin-bottom: 15px; }
         
-        /* Hiệu ứng 7 màu Welcome */
         #welcomeScreen { position: fixed; inset: 0; background: #111827; z-index: 99999; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: opacity 0.5s ease; }
         .rainbow-text { background-image: linear-gradient(270deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3); background-size: 400% 400%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: rgb-glow 3s ease infinite; font-weight: 900; font-size: 45px; text-align: center; text-transform: uppercase; padding: 0 20px; }
         @keyframes rgb-glow { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
         .dev-subtitle { color: #9ca3af; font-size: 18px; margin-top: 15px; letter-spacing: 2px; }
 
-        /* Auth UI */
         #authOverlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index: 20000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
         .auth-card { background: var(--bg-card); padding: 40px; border-radius: 20px; width: 90%; max-width: 400px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); text-align: center; }
         .auth-toggle { color: var(--primary); cursor: pointer; font-weight: bold; text-decoration: underline; }
@@ -43,7 +37,6 @@
 
         #screen-setup, #screen-preview, #screen-exam, #screen-result, #loadingOverlay { display: none; }
         
-        /* Preview UI */
         .preview-section { font-size: 20px; color: var(--primary); font-weight: 900; margin: 25px 0 10px; border-bottom: 3px solid var(--primary); padding-bottom: 5px; }
         .preview-mcq { border: 1px solid #e5e7eb; padding: 15px; border-radius: 8px; margin-bottom: 15px; background: #f9fafb; transition: 0.3s; }
         .opt-row { display: flex; align-items: center; gap: 10px; margin-top: 8px; padding: 5px; border-radius: 5px; }
@@ -71,7 +64,7 @@
             <div style="margin: 15px 0; display: flex; justify-content: center;">
                 <div class="cf-turnstile" data-sitekey="1x00000000000000000000AA" data-callback="captchaSolved"></div>
             </div>
-            <button class="btn" id="btnSubmitAuth" disabled>BẮT ĐẦU</button>
+            <button class="btn" id="btnSubmitAuth">BẮT ĐẦU</button>
             <div style="margin-top: 20px; font-size: 14px; color: var(--text-muted);">
                 <span id="authSwitchText">Chưa có tài khoản?</span> 
                 <span class="auth-toggle" id="btnSwitchAuth">Đăng ký ngay</span>
@@ -82,30 +75,31 @@
 
     <div id="loadingOverlay" style="position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index: 30000; flex-direction: column; align-items: center; justify-content: center; color: white;">
         <i class="fa-solid fa-brain fa-fade" style="font-size: 60px; color: #a855f7; margin-bottom: 20px;"></i>
-        <h3 style="color: #a855f7; text-align: center; max-width: 80%;" id="loadingText">AI đang quét cấu trúc đề...</h3>
+        <h3 style="color: #a855f7; text-align: center; max-width: 80%;" id="loadingText">AI ĐA PHƯƠNG THỨC ĐANG QUÉT...<br><small style="color: #d1d5db; font-weight: normal;">(Đọc file Word, PDF, Ảnh và nhận diện đáp án)</small></h3>
     </div>
 
     <div class="container">
         <div id="screen-setup" class="card">
             <h2 style="text-align: center;"><i class="fa-solid fa-wand-magic-sparkles"></i> Trình Tạo Đề AI Đỉnh Cao</h2>
             <div class="upload-area" onclick="document.getElementById('fileUpload').click()">
-                <i class="fa-solid fa-file-word"></i>
-                <h3 id="fileNameDisplay">Tải file Word (.docx) lên đây</h3>
-                <input type="file" id="fileUpload" accept=".docx" style="display: none;" onchange="document.getElementById('fileNameDisplay').innerText = this.files[0].name">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+                <h3 id="fileNameDisplay">Tải file Word (.docx), PDF hoặc Ảnh lên đây</h3>
+                <p style="color: var(--text-muted);">Hệ thống tự nhận diện đáp án <b>In đậm</b>, <u>Gạch chân</u>, Màu sắc hoặc Khoanh tròn.</p>
+                <input type="file" id="fileUpload" accept=".docx, .pdf, image/png, image/jpeg, image/jpg" style="display: none;" onchange="document.getElementById('fileNameDisplay').innerText = this.files[0].name">
             </div>
             <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 15px;">
                 <div><label>Tên bài thi:</label><input type="text" id="examName" placeholder="VD: Đề Toán Khảo Sát"></div>
                 <div><label>Thời gian (phút):</label><input type="number" id="examTime" value="45"></div>
             </div>
-            <button class="btn" style="background: linear-gradient(90deg, #3b82f6, #8b5cf6);" onclick="processDocx()">QUÉT BẰNG AI GEMINI <i class="fa-solid fa-rocket"></i></button>
+            <button class="btn" style="background: linear-gradient(90deg, #3b82f6, #8b5cf6);" onclick="processFile()">QUÉT BẰNG AI GEMINI <i class="fa-solid fa-rocket"></i></button>
         </div>
 
         <div id="screen-preview" class="card">
             <h2><i class="fa-solid fa-user-pen"></i> Kiểm tra & Chỉnh sửa</h2>
             <div id="previewContainer" style="max-height: 600px; overflow-y: auto;"></div>
-            <button class="btn btn-success" id="btnSaveToDatabase" style="margin-top:20px;">LƯU VÀO DATABASE</button>
+            <button class="btn btn-success" id="btnSaveToDatabase" style="margin-top:20px;">LƯU VÀO DATABASE & NHẬN LINK</button>
             <div id="shareLinkArea" style="display: none; margin-top: 20px;">
-                <input type="text" id="shareLink" readonly>
+                <input type="text" id="shareLink" readonly style="font-weight:bold; color:var(--primary);">
                 <button class="btn btn-outline" onclick="copyLink()">Copy Link</button>
             </div>
         </div>
@@ -143,32 +137,31 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        let isLoginMode = true; let isCaptchaSolved = false; let currentUser = null;
+        let isLoginMode = true; let currentUser = null;
         let rawData = { title: "", time: 45, items: [] };
 
-        // Welcome screen
         setTimeout(() => { document.getElementById('welcomeScreen').style.opacity = '0'; setTimeout(()=>document.getElementById('welcomeScreen').style.display='none',500); }, 2500);
 
         // --- AUTH LOGIC ---
-        window.captchaSolved = function() { isCaptchaSolved = true; document.getElementById('btnSubmitAuth').disabled = false; };
+        window.captchaSolved = function() { console.log("Captcha OK"); };
         
         document.getElementById('btnSwitchAuth').onclick = () => {
             isLoginMode = !isLoginMode;
             document.getElementById('authTitle').innerText = isLoginMode ? 'Đăng Nhập Hệ Thống' : 'Tạo Tài Khoản Mới';
             document.getElementById('btnSubmitAuth').innerText = isLoginMode ? 'BẮT ĐẦU' : 'ĐĂNG KÝ NGAY';
             document.getElementById('btnSwitchAuth').innerText = isLoginMode ? 'Đăng ký ngay' : 'Đăng nhập';
+            document.getElementById('authError').style.display = 'none';
         };
 
         document.getElementById('btnSubmitAuth').onclick = async () => {
             const email = document.getElementById('authEmail').value;
             const pass = document.getElementById('authPassword').value;
             const errorEl = document.getElementById('authError');
-            if (!isCaptchaSolved) return alert("Vui lòng xác minh Captcha!");
             
             document.getElementById('btnSubmitAuth').innerText = "Đang xử lý...";
             try {
                 if (isLoginMode) { await signInWithEmailAndPassword(auth, email, pass); }
-                else { await createUserWithEmailAndPassword(auth, email, pass); alert("Đăng ký thành công!"); }
+                else { await createUserWithEmailAndPassword(auth, email, pass); alert("Tạo tài khoản thành công!"); }
             } catch (e) {
                 console.error(e);
                 errorEl.innerText = "Lỗi: " + e.message;
@@ -195,34 +188,48 @@
 
         document.getElementById('btnLogout').onclick = () => signOut(auth);
 
-        // --- AI & DOCX LOGIC ---
-        window.processDocx = function() {
+        // --- FILE & AI LOGIC ---
+        window.processFile = function() {
             let file = document.getElementById('fileUpload').files[0];
-            if (!file) return alert("Chọn file Word!");
+            if (!file) return alert("Chọn file Word, PDF hoặc Ảnh đi Phúc ơi!");
             rawData.title = document.getElementById('examName').value || "Đề thi mới";
             rawData.time = parseInt(document.getElementById('examTime').value) || 45;
 
             document.getElementById('loadingOverlay').style.display = 'flex';
-            let reader = new FileReader();
-            reader.onload = function(e) {
-                mammoth.convertToHtml({arrayBuffer: e.target.result}, { styleMap: ["b => b", "u => u"] })
-                .then(result => goiAIBocTach(result.value))
-                .catch(err => alert("Lỗi đọc file!"));
-            };
-            reader.readAsArrayBuffer(file);
+            
+            // Nếu là Word (.docx)
+            if (file.name.endsWith('.docx')) {
+                let reader = new FileReader();
+                reader.onload = function(e) {
+                    mammoth.convertToHtml({arrayBuffer: e.target.result}, { styleMap: ["b => b", "strong => b", "u => u", "strike => s"] })
+                    .then(result => goiAIBocTach({ type: "html", content: result.value }))
+                    .catch(err => { alert("Lỗi đọc file Word!"); document.getElementById('loadingOverlay').style.display = 'none'; });
+                };
+                reader.readAsArrayBuffer(file);
+            } 
+            // Nếu là PDF hoặc Ảnh (Base64)
+            else {
+                let reader = new FileReader();
+                reader.onload = function(e) {
+                    let base64Data = e.target.result.split(',')[1];
+                    goiAIBocTach({ type: "media", content: base64Data, mimeType: file.type });
+                };
+                reader.readAsDataURL(file);
+            }
         };
 
-        async function goiAIBocTach(html) {
+        async function goiAIBocTach(payload) {
             try {
                 const res = await fetch('/api/tach-de', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ textHtml: html })
+                    body: JSON.stringify(payload)
                 });
                 const data = await res.json();
+                if(data.error) throw new Error(data.error);
                 rawData.items = data;
                 showPreview();
-            } catch (e) { alert("Lỗi kết nối AI!"); }
+            } catch (e) { alert("Lỗi AI: " + e.message); }
             finally { document.getElementById('loadingOverlay').style.display = 'none'; }
         }
 
@@ -237,15 +244,15 @@
             let html = '';
             rawData.items.forEach((item, i) => {
                 if(item.type === 'section') {
-                    html += `<div class="preview-section"><input type="text" id="sec-${i}" value="${item.text}"></div>`;
+                    html += `<div class="preview-section"><input type="text" id="sec-${i}" value="${item.text.replace(/"/g, '&quot;')}"></div>`;
                 } else {
                     html += `<div class="preview-mcq">
-                        <textarea id="eq-${i}">${item.text}</textarea>
+                        <textarea id="eq-${i}" style="width:100%; border:none; font-weight:bold; min-height:50px;">${item.text}</textarea>
                         <div class="opt-group-${i}">`;
                     item.options.forEach((opt, j) => {
                         html += `<div class="opt-row ${opt.isCorrect?'is-correct-row':''}">
                             <input type="radio" name="r-${i}" ${opt.isCorrect?'checked':''} id="r-${i}-${j}" onchange="updateRowColor(${i}, this)">
-                            <b>${opt.label}.</b> <input type="text" id="t-${i}-${j}" value="${opt.text}">
+                            <b>${opt.label}.</b> <input type="text" id="t-${i}-${j}" value="${opt.text.replace(/"/g, '&quot;')}" style="border:none; background:transparent;">
                         </div>`;
                     });
                     html += `</div></div>`;
@@ -270,7 +277,7 @@
                 const docRef = await addDoc(collection(db, "exams"), { ...rawData, author: currentUser.uid, date: new Date() });
                 document.getElementById('shareLink').value = window.location.origin + "?id=" + docRef.id;
                 document.getElementById('shareLinkArea').style.display = 'block';
-            } catch (e) { alert("Lỗi lưu DB!"); }
+            } catch (e) { alert("Lỗi lưu DB: " + e.message); }
             finally { document.getElementById('loadingOverlay').style.display = 'none'; }
         };
 
@@ -287,15 +294,15 @@
 
         function startTest() {
             document.getElementById('screen-exam').style.display = 'flex';
-            let html = `<h2>${rawData.title}</h2>`;
+            let html = `<h2>${rawData.title}</h2><hr/>`;
             rawData.items.forEach((item, i) => {
                 if(item.type === 'section') html += `<h3 class="preview-section">${item.text}</h3>`;
                 else {
-                    html += `<div class="card"><b>${item.text}</b><br>`;
+                    html += `<div class="card"><b>${item.text}</b><br><div style="margin-top:10px;">`;
                     item.options.forEach((opt, j) => {
-                        html += `<label style="display:block; margin:10px 0;"><input type="radio" name="q-${i}" onchange="userAns[${i}]=${j}"> ${opt.label}. ${opt.text}</label>`;
+                        html += `<label style="display:block; padding:8px; border:1px solid #eee; border-radius:5px; margin-bottom:5px; cursor:pointer;"><input type="radio" name="q-${i}" onchange="userAns[${i}]=${j}"> <b>${opt.label}.</b> ${opt.text}</label>`;
                     });
-                    html += `</div>`;
+                    html += `</div></div>`;
                 }
             });
             document.getElementById('quizRender').innerHTML = html;
@@ -319,7 +326,7 @@
             });
             document.getElementById('screen-exam').style.display = 'none';
             document.getElementById('screen-result').style.display = 'block';
-            document.getElementById('finalScore').innerText = ((score/total)*10).toFixed(2);
+            document.getElementById('finalScore').innerText = total > 0 ? ((score/total)*10).toFixed(2) : "0";
             confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
         };
         
