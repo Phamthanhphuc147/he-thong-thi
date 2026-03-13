@@ -18,53 +18,60 @@
             --secondary: #0ea5e9; 
             --bg-body: #f8fafc; --bg-card: #ffffff; 
             --text-main: #334155; --text-muted: #64748b; 
-            --correct: #2563eb; --correct-bg: #eff6ff; /* Đổi màu đúng sang Xanh Azota */
+            --correct: #10b981; --correct-bg: #d1fae5; 
+            --azota-blue: #2563eb; --azota-blue-bg: #eff6ff;
             --wrong: #ef4444; --wrong-bg: #fee2e2;
-            --shadow-lg: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); 
-            --radius: 12px; 
+            --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01); 
+            --radius: 16px; 
         }
         * { box-sizing: border-box; }
         
         body { font-family: 'Quicksand', sans-serif; background: var(--bg-body); color: var(--text-main); margin: 0; padding: 20px; line-height: 1.6; min-height: 100vh;}
         .container { max-width: 1050px; margin: auto; position: relative; }
         
-        .card { background: var(--bg-card); border-radius: var(--radius); padding: 30px; box-shadow: var(--shadow-lg); margin-bottom: 25px; border: 1px solid #e2e8f0; }
-        h2, h3 { margin-top: 0; color: var(--primary); font-weight: 700; }
+        .card { background: var(--bg-card); border-radius: var(--radius); padding: 30px; box-shadow: var(--shadow-lg); margin-bottom: 25px; border: 1px solid #f1f5f9; }
+        h2, h3 { margin-top: 0; color: var(--primary); font-weight: 800; letter-spacing: -0.5px; }
         
-        input[type="text"], input[type="number"], input[type="password"], input[type="email"], textarea { width: 100%; padding: 12px 15px; margin-bottom: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-family: inherit; font-size: 15px; color: var(--text-main); transition: 0.2s;}
-        input:focus, textarea:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+        input[type="text"], input[type="number"], input[type="password"], input[type="email"], textarea { width: 100%; padding: 14px 16px; margin-bottom: 15px; border: 2px solid #e2e8f0; border-radius: 10px; font-family: inherit; font-size: 15px; color: var(--text-main); background: #f8fafc; transition: 0.3s; font-weight: 600;}
+        input:focus, textarea:focus { border-color: var(--primary); outline: none; background: white; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); }
         
-        .btn { background: var(--primary); color: white; border: none; padding: 12px 20px; font-size: 15px; font-weight: 700; border-radius: 8px; cursor: pointer; display: inline-flex; gap: 8px; align-items: center; justify-content: center; transition: all 0.2s ease; width: 100%; }
-        .btn:hover { background: var(--primary-hover); transform: translateY(-1px); }
-        .btn-success { background: #10b981; } .btn-success:hover { background: #059669; }
-        .btn-outline { background: white; border: 1px solid #cbd5e1; color: var(--text-main); } .btn-outline:hover { background: #f1f5f9; border-color: #94a3b8;}
+        .btn { background: var(--primary); color: white; border: none; padding: 14px 24px; font-size: 16px; font-weight: 700; border-radius: 10px; cursor: pointer; display: inline-flex; gap: 8px; align-items: center; justify-content: center; transition: all 0.2s ease; width: 100%; box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2); }
+        .btn:hover { background: var(--primary-hover); transform: translateY(-2px); box-shadow: 0 6px 12px rgba(37, 99, 235, 0.3); }
+        .btn-success { background: var(--correct); box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2); } .btn-success:hover { background: #059669; }
+        .btn-outline { background: white; border: 2px solid var(--primary); color: var(--primary); box-shadow: none; } .btn-outline:hover { background: #eef2ff; transform: translateY(0); }
         
-        .upload-area { border: 2px dashed #93c5fd; padding: 50px 20px; text-align: center; border-radius: var(--radius); cursor: pointer; background: #eff6ff; margin-bottom: 20px; transition: 0.3s; }
-        .upload-area:hover { border-color: var(--primary); background: #dbeafe; }
-        .upload-area i { font-size: 50px; color: var(--primary); margin-bottom: 15px;}
+        .upload-area { border: 3px dashed #cbd5e1; padding: 60px 20px; text-align: center; border-radius: var(--radius); cursor: pointer; background: #f8fafc; margin-bottom: 20px; transition: 0.3s; }
+        .upload-area:hover { border-color: var(--primary); background: #eff6ff; }
+        .upload-area i { font-size: 60px; color: var(--primary); margin-bottom: 15px; opacity: 0.8;}
         
-        #authOverlay { position: fixed; inset:0; background:rgba(15, 23, 42, 0.8); z-index: 20000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-        .auth-card { background: white; padding: 40px; border-radius: 20px; width: 90%; max-width: 400px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); text-align: center; }
+        #authOverlay { position: fixed; inset:0; background:rgba(15, 23, 42, 0.8); z-index: 20000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
+        .auth-card { background: white; padding: 40px; border-radius: 24px; width: 90%; max-width: 420px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); text-align: center; }
         
-        .app-screen { display: none; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .app-screen { display: none; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* UI CHỈNH SỬA - CLONE AZOTA 100% */
-        .preview-section { font-size: 18px; color: var(--primary); font-weight: 700; padding: 10px 15px; background: #f1f5f9; border-left: 4px solid var(--primary); margin: 20px 0; border-radius: 0 8px 8px 0;}
+        .preview-section { font-size: 20px; color: var(--secondary); font-weight: 800; border-bottom: 3px solid var(--secondary); padding-bottom: 8px; margin: 30px 0 15px 0; text-transform: uppercase;}
         .azota-opt-row { display: flex; align-items: center; margin-bottom: 10px; gap: 12px; }
-        .azota-check-area { width: 24px; text-align: center; color: var(--correct); font-size: 18px; display: flex; align-items: center; justify-content: center;}
-        .azota-label-box { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border: 1px solid #cbd5e1; border-radius: 6px; font-weight: 700; color: #475569; cursor: pointer; background: white; transition: 0.2s; font-size: 16px; flex-shrink: 0;}
-        .azota-label-box:hover { border-color: var(--primary); }
-        .azota-label-box.is-correct-box { border-color: var(--correct); color: var(--correct); background: var(--correct-bg); }
+        .azota-check-area { width: 28px; text-align: center; color: var(--azota-blue); font-size: 20px; display: flex; align-items: center; justify-content: center;}
+        .azota-label-box { width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; border: 2px solid #cbd5e1; border-radius: 8px; font-weight: 800; color: #475569; cursor: pointer; background: white; transition: 0.2s; font-size: 16px; flex-shrink: 0;}
+        .azota-label-box:hover { border-color: var(--azota-blue); }
+        .azota-label-box.is-correct-box { border-color: var(--azota-blue); color: var(--azota-blue); background: var(--azota-blue-bg); }
         .azota-input-area { flex: 1; }
-        .azota-input-area input { margin: 0; padding: 10px 15px; border-color: #cbd5e1; background: white;}
-        
+        .azota-input-area input { margin: 0; padding: 12px 15px; border-color: #cbd5e1; background: white;}
+
         /* UI Trắc Nghiệm Thi */
-        .opt-label { display: flex; align-items: flex-start; padding: 15px; border: 1px solid #cbd5e1; border-radius: 8px; cursor: pointer; transition: 0.2s; background: white; margin-bottom: 10px; font-weight: 600;}
+        .opt-label { display: flex; align-items: flex-start; padding: 15px; border: 2px solid #e2e8f0; border-radius: 12px; cursor: pointer; transition: 0.2s; background: white; margin-bottom: 10px; font-weight: 600; font-size: 16px;}
         .opt-label:hover { border-color: var(--primary); background: #f8fafc; }
-        .opt-label.selected { border-color: var(--primary); background: var(--correct-bg); box-shadow: 0 0 0 1px var(--primary); }
+        .opt-label.selected { border-color: var(--primary); background: #eff6ff; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.1); }
         
-        .top-bar { display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px 25px; border-radius: var(--radius); margin-bottom: 20px; box-shadow: var(--shadow-lg); border: 1px solid #e2e8f0;}
+        /* Leaderboard Table */
+        .lb-row { display: flex; justify-content: space-between; padding: 12px 15px; border-bottom: 1px solid #e2e8f0; font-weight: 700; font-size: 15px;}
+        .lb-row:nth-child(1) { background: #fffbeb; color: #b45309; border-radius: 8px; border: none; font-size: 17px;} 
+        .lb-row:nth-child(2) { background: #f1f5f9; color: #475569; border-radius: 8px; border: none;} 
+        .lb-row:nth-child(3) { background: #fff7ed; color: #9a3412; border-radius: 8px; border: none;} 
+
+        .top-bar { display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px 25px; border-radius: var(--radius); margin-bottom: 20px; box-shadow: var(--shadow-lg); }
 
         @media (max-width: 768px) {
             body { padding: 10px; }
@@ -79,21 +86,21 @@
 <body>
 
     <div id="loadingOverlay" style="position: fixed; inset:0; background:rgba(255, 255, 255, 0.9); z-index: 30000; display: none; flex-direction: column; align-items: center; justify-content: center;">
-        <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 50px; color: var(--primary); margin-bottom: 20px;"></i>
-        <h3 style="color: #334155; text-align: center; font-weight: 700;" id="loadingText">Đang xử lý dữ liệu...</h3>
+        <i class="fa-solid fa-spinner fa-spin" style="font-size: 60px; color: var(--primary); margin-bottom: 20px;"></i>
+        <h2 style="color: var(--primary); text-align: center; font-weight: 800;" id="loadingText">Hệ Thống Đang Xử Lý...</h2>
     </div>
 
     <div id="authOverlay">
         <div class="auth-card">
-            <h2 id="authTitle" style="font-size: 24px; margin-bottom: 5px;">Hệ Thống Trắc Nghiệm</h2>
-            <p style="color: var(--text-muted); margin-bottom: 25px; font-weight: 600; font-size: 14px;">Bản quyền: TH4NHPHVC</p>
+            <h2 id="authTitle" style="font-size: 28px; margin-bottom: 5px;">Đăng Nhập AZOTA PRO</h2>
+            <p style="color: var(--text-muted); margin-bottom: 25px; font-weight: 600;">Hệ sinh thái học tập by TH4NHPHVC</p>
             <input type="email" id="authEmail" placeholder="Email của bạn">
             <input type="password" id="authPassword" placeholder="Mật khẩu (Ít nhất 6 ký tự)">
             <div style="margin: 15px 0; display: flex; justify-content: center;">
                 <div class="cf-turnstile" data-sitekey="1x00000000000000000000AA"></div>
             </div>
-            <button class="btn" id="btnSubmitAuth">ĐĂNG NHẬP</button>
-            <div style="margin-top: 20px; font-size: 14px; font-weight: 600;">
+            <button class="btn" id="btnSubmitAuth">BẮT ĐẦU VÀO TRANG</button>
+            <div style="margin-top: 20px; font-size: 15px; font-weight: 700;">
                 <span id="authSwitchText" style="color: var(--text-muted);">Chưa có tài khoản?</span> 
                 <span style="color: var(--primary); cursor: pointer;" id="btnSwitchAuth">Đăng ký ngay</span>
             </div>
@@ -104,80 +111,93 @@
     <div class="container" id="mainApp" style="display:none;">
         
         <div class="top-bar">
-            <div><i class="fa-solid fa-graduation-cap" style="color: var(--primary); font-size: 20px;"></i> <b id="userEmailDisplay" style="margin-left: 8px;">Giáo viên</b></div>
-            <button class="btn btn-outline" style="width: auto; padding: 6px 12px; font-size: 13px;" id="btnLogout">Đăng xuất</button>
+            <div><i class="fa-solid fa-graduation-cap" style="color: var(--primary); font-size: 24px;"></i> <b id="userEmailDisplay" style="margin-left: 8px; font-size: 18px;">Giáo viên</b></div>
+            <button class="btn btn-outline" style="width: auto; padding: 8px 15px; font-size: 14px;" id="btnLogout"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</button>
         </div>
 
         <div id="screen-setup" class="app-screen card">
-            <h2 style="text-align: center; font-size: 28px;">Trình Tạo Đề Thông Minh</h2>
-            <p style="text-align: center; color: var(--text-muted); margin-bottom: 30px; font-size: 15px;">Động cơ tự động tách dòng, nhận diện (*), (Đ)/(S), In đậm.</p>
+            <h2 style="text-align: center; font-size: 32px;">Trình Tạo Đề Thông Minh</h2>
+            <p style="text-align: center; color: var(--text-muted); margin-bottom: 30px; font-weight: 600;">Động cơ thế hệ 4.0: Bẻ dòng tự động, nhận diện (*), (Đ)/(S), In đậm.</p>
             
             <div class="upload-area" onclick="document.getElementById('fileUpload').click()">
-                <i class="fa-solid fa-file-arrow-up"></i>
-                <h3 id="fileNameDisplay" style="color: var(--text-main); font-size: 20px; margin-bottom: 5px;">Tải đề thi lên đây</h3>
-                <p style="color: var(--text-muted); margin:0;">Hỗ trợ .docx, .pdf, hình ảnh</p>
+                <i class="fa-solid fa-file-word"></i>
+                <h3 id="fileNameDisplay" style="color: var(--text-main); font-size: 22px; margin-bottom: 5px;">Tải đề thi lên đây (Word, PDF, Ảnh)</h3>
+                <p style="color: var(--text-muted); font-weight: 600; margin:0;">Thuật toán sẽ tự động phân loại cấu trúc.</p>
                 <input type="file" id="fileUpload" accept=".docx, .pdf, image/*" style="display: none;" onchange="document.getElementById('fileNameDisplay').innerText = this.files[0].name">
             </div>
             
-            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 15px; margin-bottom: 20px;">
-                <div><label style="font-weight:600; color: #475569; font-size: 14px;">Tên Bài Thi:</label><input type="text" id="examName" placeholder="VD: Kiểm tra 15 phút"></div>
-                <div><label style="font-weight:600; color: #475569; font-size: 14px;">Thời Gian (Phút):</label><input type="number" id="examTime" value="45"></div>
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 25px;">
+                <div><label style="font-weight:700; color: var(--text-muted); margin-bottom: 8px; display: block;">Tên Bài Thi:</label><input type="text" id="examName" placeholder="VD: Kiểm tra Toán 11"></div>
+                <div><label style="font-weight:700; color: var(--text-muted); margin-bottom: 8px; display: block;">Thời Gian (Phút):</label><input type="number" id="examTime" value="45"></div>
             </div>
-            <button class="btn" style="padding: 16px; font-size: 16px;" onclick="processFile()"><i class="fa-solid fa-bolt"></i> BẮC TÁCH ĐỀ (0.1s)</button>
+            <button class="btn" style="padding: 18px; font-size: 18px;" onclick="processFile()"><i class="fa-solid fa-bolt"></i> BẮT ĐẦU BÓC TÁCH</button>
         </div>
 
         <div id="screen-preview" class="app-screen card">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;">
                 <button class="btn btn-outline" style="width: auto;" onclick="switchScreen('screen-setup')"><i class="fa-solid fa-arrow-left"></i> Quay lại</button>
-                <button class="btn btn-outline" style="width: auto; color: #8b5cf6; border-color: #8b5cf6;" onclick="refineWithAI()"><i class="fa-solid fa-robot"></i> Nhờ AI Sửa Lỗi</button>
+                <h2 style="margin:0; font-size: 26px;">Kiểm Tra Dữ Liệu</h2>
+                <button class="btn" style="width: auto; background: #8b5cf6;" onclick="refineWithAI()"><i class="fa-solid fa-robot"></i> Nhờ AI Fix Lỗi Tự Động</button>
             </div>
             
             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #e2e8f0;">
-                <div style="background: #e0e7ff; padding: 8px 12px; border-radius: 6px; font-weight: bold; color: var(--primary);">Thông tin đề</div>
-                <div style="color: var(--text-muted); font-size: 14px;">Click vào ô chữ (A, B, C, D) để đổi đáp án đúng thủ công.</div>
+                <div style="background: var(--azota-blue-bg); padding: 8px 12px; border-radius: 6px; font-weight: bold; color: var(--azota-blue);"><i class="fa-solid fa-info-circle"></i> Mẹo</div>
+                <div style="color: var(--text-muted); font-size: 15px; font-weight: 600;">Click vào ô chữ (A, B, C, D) để đổi đáp án đúng thủ công.</div>
             </div>
             
-            <div id="previewContainer" style="max-height: 550px; overflow-y: auto; padding-right: 5px;"></div>
+            <div id="previewContainer" style="max-height: 550px; overflow-y: auto; padding-right: 10px; margin-top: 10px;"></div>
             
-            <button class="btn btn-success" id="btnSaveToDatabase" style="margin-top:20px; padding: 16px;">
-                <i class="fa-solid fa-cloud-arrow-up"></i> LƯU ĐỀ & LẤY LINK
+            <button class="btn btn-success" id="btnSaveToDatabase" style="margin-top:25px; padding: 16px; font-size: 18px;">
+                <i class="fa-solid fa-share-nodes"></i> LƯU ĐỀ & XUẤT LINK THI
             </button>
             
-            <div id="shareLinkArea" style="display: none; margin-top: 20px; background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0;">
-                <label style="color: var(--text-main); font-weight: bold;">Link đề thi:</label>
-                <div style="display: flex; gap: 10px; margin-top: 10px;">
-                    <input type="text" id="shareLink" readonly style="margin: 0; color: var(--primary); font-weight: 600;">
-                    <button class="btn btn-outline" style="width: auto;" onclick="copyLink()">Copy</button>
-                    <button class="btn btn-success" style="width: auto;" onclick="startTestMode()">Thi Thử</button>
+            <div id="shareLinkArea" style="display: none; margin-top: 25px; background: #f8fafc; padding: 25px; border-radius: 15px; border: 2px solid #e2e8f0;">
+                <label style="color: var(--primary); font-size: 18px; font-weight: 800;">🎉 Đã tạo Link! Gửi cho học sinh ngay:</label>
+                <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
+                    <input type="text" id="shareLink" readonly style="margin: 0; font-weight: 700; color: var(--primary); font-size: 16px; flex: 1; min-width: 200px;">
+                    <button class="btn btn-outline" style="width: auto; border-width: 2px;" onclick="copyLink()">COPY</button>
+                    <button class="btn btn-success" style="width: auto;" onclick="startTestMode()">VÀO THI NGAY</button>
                 </div>
             </div>
         </div>
 
         <div id="screen-exam" class="app-screen">
-            <div id="exam-layout" style="display: flex; gap: 20px; align-items: flex-start;">
-                <div class="card" id="quizRender" style="flex: 1; margin-bottom: 0; max-height: 80vh; overflow-y: auto; padding: 40px;"></div>
+            <div id="exam-layout" style="display: flex; gap: 25px; align-items: flex-start;">
+                <div class="card" id="quizRender" style="flex: 1; margin-bottom: 0; max-height: 80vh; overflow-y: auto;"></div>
                 
-                <div class="card" id="timer-card" style="width: 250px; position: sticky; top: 20px; text-align: center;">
-                    <div style="color: var(--text-muted); font-size: 13px; font-weight: 600;">THỜI GIAN</div>
-                    <h2 id="timerDisplay" style="color: var(--wrong); font-size: 40px; margin: 5px 0 20px 0;">00:00</h2>
-                    <button class="btn" id="btnSubmitExam" onclick="submitTest()">NỘP BÀI</button>
+                <div class="card" id="timer-card" style="width: 280px; position: sticky; top: 20px; text-align: center; border: 2px solid #e2e8f0;">
+                    <h3 style="color: var(--text-muted); font-size: 15px; margin-bottom: 5px; text-transform: uppercase;">THỜI GIAN CÒN LẠI</h3>
+                    <h2 id="timerDisplay" style="color: var(--wrong); font-size: 48px; margin-bottom: 25px;">00:00</h2>
+                    <button class="btn" id="btnSubmitExam" onclick="submitTest()" style="padding: 15px; font-size: 18px;"><i class="fa-solid fa-paper-plane"></i> NỘP BÀI</button>
                 </div>
             </div>
         </div>
 
-        <div id="screen-result" class="app-screen card">
-            <div style="text-align: center;">
-                <h2>ĐIỂM CỦA BẠN</h2>
-                <h1 id="finalScore" style="font-size: 80px; color: #10b981; margin: 0;">10</h1>
-                <p id="scoreText" style="font-size: 18px; color: var(--text-muted); margin-bottom: 25px;">Làm đúng: 0/0 câu</p>
+        <div id="screen-result" class="app-screen">
+            <div class="card" style="text-align: center; border-top: 8px solid var(--correct);">
+                <h2 style="font-size: 28px;">ĐIỂM SỐ CỦA BẠN</h2>
+                <h1 id="finalScore" style="font-size: 100px; color: var(--correct); margin: 0;">10</h1>
+                <p id="scoreText" style="font-size: 20px; font-weight: 800; color: var(--text-muted); background: #f1f5f9; display: inline-block; padding: 10px 25px; border-radius: 20px; margin-top: 15px;">Đúng 0 / 0 câu</p>
                 
-                <div style="display: flex; justify-content: center; gap: 10px;">
-                    <button class="btn btn-outline" style="width: auto;" onclick="startTestMode()">Làm Lại</button>
-                    <button class="btn" style="width: auto;" onclick="window.location.href=window.location.pathname">Trang Chủ</button>
+                <div style="display: flex; justify-content: center; gap: 15px; margin-top: 25px; flex-wrap: wrap;">
+                    <button class="btn btn-outline" style="width: auto; padding: 12px 25px;" onclick="startTestMode()"><i class="fa-solid fa-rotate-right"></i> Làm Lại Đề Này</button>
+                    <button class="btn" style="width: auto; padding: 12px 25px;" onclick="window.location.href=window.location.pathname"><i class="fa-solid fa-house"></i> Về Trang Chủ</button>
                 </div>
             </div>
-            
-            <div id="reviewRender" style="margin-top: 40px; border-top: 1px solid #e2e8f0; padding-top: 20px;"></div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
+                <div class="card" style="max-height: 600px; overflow-y: auto; padding: 25px;">
+                    <h3 style="border-bottom: 2px dashed #e2e8f0; padding-bottom: 15px; margin-bottom: 20px; font-size: 20px;"><i class="fa-solid fa-list-check"></i> ĐÁP ÁN CHI TIẾT</h3>
+                    <div id="reviewRender"></div>
+                </div>
+                
+                <div class="card" style="padding: 25px;">
+                    <h3 style="border-bottom: 2px dashed #e2e8f0; padding-bottom: 15px; margin-bottom: 20px; font-size: 20px;"><i class="fa-solid fa-trophy" style="color: #eab308;"></i> BẢNG VÀNG THÀNH TÍCH</h3>
+                    <div id="leaderboardRender">
+                        <p style="color: var(--text-muted); font-weight: 600; text-align: center;">Đang tải dữ liệu...</p>
+                    </div>
+                </div>
+            </div>
         </div>
 
     </div>
@@ -185,7 +205,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, doc, getDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAGk0pgSXDviwxbqnLMiUL43-qwZUX87eY",
@@ -200,7 +220,7 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        let isLoginMode = true; let currentUser = null; let currentUserName = "Guest";
+        let isLoginMode = true; let currentUser = null; let currentUserName = "Khách";
         let rawData = { title: "", time: 45, items: [] };
         let currentExamId = null; let tempRawHtml = ""; 
 
@@ -210,91 +230,107 @@
             window.scrollTo(0,0);
         };
 
-        // --- ĐỘNG CƠ REGEX 4.0: BẺ DÒNG THÔNG MINH ---
+        // --- BỘ LỌC REGEX THẾ HỆ 4.0: AZOTA CLONE HOÀN HẢO ---
         function parseWordToExam(htmlString) {
             let items = [];
             
-            // 1. Gắn thẻ tàng hình cho Chữ in đậm / Gạch chân để không bị mất khi lấy text
+            // 1. Tiền xử lý: Bảo toàn bôi đậm/gạch chân thành Text tàng hình
             let processedHtml = htmlString
                 .replace(/<strong>(.*?)<\/strong>/gi, ' [!b:$1$] ')
                 .replace(/<b>(.*?)<\/b>/gi, ' [!b:$1$] ')
                 .replace(/<u>(.*?)<\/u>/gi, ' [!u:$1$] ')
                 .replace(/<\/p>/gi, '\n')
-                .replace(/<br\s*\/?>/gi, '\n');
+                .replace(/<br\s*\/?>/gi, '\n')
+                .replace(/<\/div>/gi, '\n');
 
             let tempDiv = document.createElement('div');
             tempDiv.innerHTML = processedHtml;
             let rawText = tempDiv.textContent || tempDiv.innerText;
             
+            // XÓA KÝ TỰ TÀNG HÌNH (Gây lỗi Regex)
             rawText = rawText.replace(/[\u200B-\u200D\uFEFF]/g, '');
 
-            // LOGIC BẺ DÒNG: Tự động chèn Enter trước A. B. C. D. dù nó nằm chung hàng
-            let cleanText = rawText.replace(/(\s+)(\*?\s*(?:\[![bu]:\$)?\s*[A-D][\.\:\)](?:\$\])?)/g, '\n$2');
+            // CHỐNG DÍNH DÒNG CỰC MẠNH: Tự động chèn Enter trước A. B. C. D. dù dính chùm
+            let cleanText = rawText.replace(/(\s+)(\*?\s*(?:\[![bu]:\$)?\s*[A-D][\.\:\)](?:\$\])?)/gi, '\n$2');
 
             let lines = cleanText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
             let currentItem = null;
 
             for (let line of lines) {
-                let textForTest = line.replace(/\[![a-z]+:\$(.*?)\$\]/g, '$1').trim();
+                // Lọc sạch text thô để Test điều kiện
+                let rawLineToTest = line.replace(/\[![a-z]+:\$(.*?)\$\]/g, '$1').trim();
 
-                // Nhận diện TIÊU ĐỀ PHẦN
-                if (/^(PHẦN|I\.|II\.|III\.|IV\.|V\.)\s+/i.test(textForTest)) {
-                    items.push({ type: 'section', text: textForTest });
+                // 1. Nhận diện PHẦN / SECTION
+                if (/^(PHẦN|I\.|II\.|III\.|IV\.|V\.)\s+/i.test(rawLineToTest)) {
+                    items.push({ type: 'section', text: rawLineToTest });
                     currentItem = null;
                     continue;
                 }
 
-                // Nhận diện CÂU HỎI
-                if (/^(Câu|Bài|Question)\s*\d+/i.test(textForTest)) {
+                // 2. Nhận diện CÂU HỎI (BẤT CHẤP LỖI CÚ PHÁP)
+                if (/^(Câu|Bài|Question)\s*\d+/i.test(rawLineToTest)) {
                     if (currentItem) items.push(currentItem);
                     currentItem = { type: 'mcq', text: line, options: [] };
                     continue;
                 }
 
-                // Nhận diện ĐÁP ÁN (Dùng regex mạnh)
-                let optMatch = line.match(/^(\*?)\s*(?:\[![bu]:\$)?\s*([A-D])[\.\:\)](?:\$\])?\s*(.*)$/i);
-                
-                if (optMatch && currentItem) {
-                    let isStarred = optMatch[1] === '*';
-                    let label = optMatch[2].toUpperCase();
-                    let content = optMatch[3].trim();
-                    let isCorrect = isStarred;
+                // 3. Xử lý dòng chứa đáp án (Bóc tách A., B., C., D.)
+                let tokens = line.split(/(\*?\s*(?:\[![bu]:\$)?\s*[A-D]\s*[\.\:\)](?:\$\])?|\*?\s*[a-d]\))/i);
 
-                    // Nhận diện bôi đậm nguyên chữ A.
-                    if (line.includes(`[!b:$${label}.]`) || line.includes(`[!b:$*${label}.]`)) isCorrect = true;
-
-                    // Nhận diện (Đ) / (S) hoặc bôi đậm cuối câu
-                    let contentTest = content.replace(/\[![a-z]+:\$(.*?)\$\]/g, '$1').toUpperCase();
-                    if (contentTest.includes('(Đ)') || contentTest.includes('[Đ]') || contentTest.endsWith(' Đ') || /\[!b:\$Đ\$\]/i.test(content)) {
-                        isCorrect = true;
-                        content = content.replace(/\[!b:\$Đ\$\]|\(Đ\)|\[Đ\]| Đ$/gi, '').trim();
-                    } else if (contentTest.includes('(S)') || contentTest.includes('[S]') || contentTest.endsWith(' S') || /\[!b:\$S\$\]/i.test(content)) {
-                        isCorrect = false;
-                        content = content.replace(/\[!b:\$S\$\]|\(S\)|\[S\]| S$/gi, '').trim();
-                    } else if (/\[![bu]:\$(.*?)\$\]/.test(content)) {
-                        isCorrect = true; // Nguyên câu trả lời bôi đậm
+                if (tokens.length > 1 && currentItem) {
+                    if (tokens[0].trim()) {
+                        let txt = tokens[0].trim();
+                        if (currentItem.options.length === 0) currentItem.text += '\n' + txt;
+                        else currentItem.options[currentItem.options.length - 1].text += '\n' + txt;
                     }
 
-                    // Dọn dẹp thẻ tàng hình để show lên UI cho đẹp
-                    content = content.replace(/\[![a-z]+:\$(.*?)\$\]/g, '$1').trim();
-                    currentItem.options.push({ label, text: content, isCorrect });
-                }
+                    for (let j = 1; j < tokens.length; j += 2) {
+                        let marker = tokens[j].trim();
+                        let content = (tokens[j+1] || "").trim();
+                        
+                        let isStarred = marker.startsWith('*'); 
+                        let cleanLabel = marker.replace(/[\*\.\:\)\[\]\!\$\w]/g, '').trim().toUpperCase(); 
+                        // Sửa lỗi regex cleanLabel: chỉ giữ lại chữ cái A,B,C,D
+                        let letterMatch = marker.match(/[A-D]/i);
+                        if(letterMatch) cleanLabel = letterMatch[0].toUpperCase();
+
+                        let isCorrect = isStarred;
+
+                        // Logic nhận diện (Đ) / (S) và In đậm đáp án
+                        let rawContentTest = content.replace(/\[![a-z]+:\$(.*?)\$\]/g, '$1').toUpperCase();
+                        
+                        // Check bôi đậm nguyên marker (VD: [!b:$A.$])
+                        if(marker.includes('[!b:$') || marker.includes('[!u:$')) isCorrect = true;
+
+                        if (rawContentTest.includes('(Đ)') || rawContentTest.includes('[Đ]') || rawContentTest.endsWith(' Đ') || /\[!b:\$Đ\$\]/i.test(content)) {
+                            isCorrect = true;
+                            content = content.replace(/\[!b:\$Đ\$\]|\(Đ\)|\[Đ\]| Đ$/gi, '').trim();
+                        } else if (rawContentTest.includes('(S)') || rawContentTest.includes('[S]') || rawContentTest.endsWith(' S') || /\[!b:\$S\$\]/i.test(content)) {
+                            isCorrect = false; 
+                            content = content.replace(/\[!b:\$S\$\]|\(S\)|\[S\]| S$/gi, '').trim();
+                        } else if (/\[![bu]:\$(.*?)\$\]/.test(content)) {
+                            isCorrect = true; // In đậm cả câu đáp án
+                        }
+
+                        content = content.replace(/\[![a-z]+:\$(.*?)\$\]/g, '$1').trim();
+                        currentItem.options.push({ label: cleanLabel, text: content, isCorrect: isCorrect });
+                    }
+                } 
                 else if (currentItem) {
-                    // Nếu là dòng text bình thường -> Nối vào câu hỏi
                     let cleanCont = line.replace(/\[![a-z]+:\$(.*?)\$\]/g, '$1');
-                    if (currentItem.options.length === 0) currentItem.text += '\n' + cleanCont;
-                    else currentItem.options[currentItem.options.length - 1].text += '\n' + cleanCont;
+                    if (currentItem.options.length === 0) { currentItem.text += '\n' + cleanCont; }
+                    else { currentItem.options[currentItem.options.length - 1].text += '\n' + cleanCont; }
                 }
             }
             if (currentItem) items.push(currentItem);
             return items;
         }
 
-        // --- AUTH ---
+        // --- ĐĂNG NHẬP ---
         document.getElementById('btnSwitchAuth').onclick = () => {
             isLoginMode = !isLoginMode;
-            document.getElementById('authTitle').innerText = isLoginMode ? 'Đăng Nhập Hệ Thống' : 'Tạo Tài Khoản Mới';
-            document.getElementById('btnSubmitAuth').innerText = isLoginMode ? 'ĐĂNG NHẬP' : 'ĐĂNG KÝ';
+            document.getElementById('authTitle').innerText = isLoginMode ? 'Đăng Nhập AZOTA PRO' : 'Tạo Tài Khoản Mới';
+            document.getElementById('btnSubmitAuth').innerText = isLoginMode ? 'BẮT ĐẦU VÀO TRANG' : 'TẠO HỒ SƠ NGAY';
             document.getElementById('btnSwitchAuth').innerText = isLoginMode ? 'Đăng ký ngay' : 'Đăng nhập';
             document.getElementById('authSwitchText').innerText = isLoginMode ? 'Chưa có tài khoản?' : 'Đã có tài khoản?';
             document.getElementById('authError').style.display = 'none';
@@ -303,12 +339,14 @@
         document.getElementById('btnSubmitAuth').onclick = async () => {
             const email = document.getElementById('authEmail').value;
             const pass = document.getElementById('authPassword').value;
+            document.getElementById('btnSubmitAuth').innerText = "Đang kiểm tra...";
             try {
                 if (isLoginMode) { await signInWithEmailAndPassword(auth, email, pass); }
-                else { await createUserWithEmailAndPassword(auth, email, pass); }
+                else { await createUserWithEmailAndPassword(auth, email, pass); Swal.fire("Tuyệt vời!", "Tạo tài khoản thành công!", "success"); }
             } catch (e) {
                 document.getElementById('authError').innerText = "Lỗi: " + e.message;
                 document.getElementById('authError').style.display = 'block';
+                document.getElementById('btnSubmitAuth').innerText = "THỬ LẠI";
             }
         };
 
@@ -319,11 +357,23 @@
                 document.getElementById('authOverlay').style.display = 'none';
                 document.getElementById('mainApp').style.display = 'block';
                 document.getElementById('userEmailDisplay').innerText = currentUserName;
+                
+                if (!sessionStorage.getItem('welcomed')) {
+                    Swal.fire({
+                        title: "CHÀO MỪNG ĐẾN AZOTA PRO",
+                        html: "<div style='line-height:1.6; text-align:left;'><b>Hệ thống Động cơ Kép (Regex + AI)</b><br><br>Cập nhật tính năng Bẻ dòng tự động và Giao diện chấm mượt mà.<br>Mọi góp ý vui lòng Zalo Admin: <b style='color:var(--primary);'>0328583859 (Thành Phúc)</b></div>",
+                        icon: "info", confirmButtonColor: "#4f46e5"
+                    });
+                    sessionStorage.setItem('welcomed', 'true');
+                }
 
                 const urlParams = new URLSearchParams(window.location.search);
                 currentExamId = urlParams.get('id');
-                if (currentExamId) { loadExamFromDatabase(currentExamId); } 
-                else { switchScreen('screen-setup'); }
+                if (currentExamId) { 
+                    const { value: name } = await Swal.fire({ title: 'Tên của bạn là gì?', input: 'text', inputValue: currentUserName, allowOutsideClick: false, confirmButtonText: 'Bắt đầu', confirmButtonColor: '#4f46e5' });
+                    if(name) currentUserName = name;
+                    loadExamFromDatabase(currentExamId); 
+                } else { switchScreen('screen-setup'); }
             } else {
                 document.getElementById('authOverlay').style.display = 'flex';
                 document.getElementById('mainApp').style.display = 'none';
@@ -332,10 +382,10 @@
 
         document.getElementById('btnLogout').onclick = () => { signOut(auth); };
 
-        // --- XỬ LÝ FILE ---
+        // --- XỬ LÝ FILE (TỰ ĐỘNG CHUYỂN AI NẾU REGEX BÓ TAY) ---
         window.processFile = function() {
             let file = document.getElementById('fileUpload').files[0];
-            if (!file) return alert("Chọn file đi bạn!");
+            if (!file) return Swal.fire("Lỗi", "Bạn chưa chọn file để bóc tách!", "warning");
             
             rawData.title = document.getElementById('examName').value || "Bài Tập Trắc Nghiệm";
             rawData.time = parseInt(document.getElementById('examTime').value) || 45;
@@ -343,7 +393,7 @@
             document.getElementById('loadingOverlay').style.display = 'flex';
             
             if (file.name.endsWith('.docx')) {
-                document.getElementById('loadingText').innerText = "Đang cắt dòng và tách đáp án (0.1s)...";
+                document.getElementById('loadingText').innerHTML = "Đang cắt dòng và tách đáp án tự động...<br><small>(Tốc độ 0.1s)</small>";
                 let reader = new FileReader();
                 reader.onload = function(e) {
                     mammoth.convertToHtml({arrayBuffer: e.target.result}, { styleMap: ["b => b", "strong => b", "u => u"] })
@@ -351,8 +401,9 @@
                         tempRawHtml = result.value; 
                         let extractedItems = parseWordToExam(result.value);
                         
+                        // FALLBACK AI:
                         if(extractedItems.length === 0) {
-                            document.getElementById('loadingText').innerText = "File lỗi form. Tự động chuyển sang chế độ AI nhận diện...";
+                            document.getElementById('loadingText').innerHTML = "Cấu trúc đề hơi dị. Đang tự động chuyển sang AI nhận diện...<br><small>(Chờ khoảng 15s)</small>";
                             goiAIBocTach({ type: "html", content: tempRawHtml });
                             return; 
                         }
@@ -360,23 +411,25 @@
                         rawData.items = extractedItems;
                         document.getElementById('loadingOverlay').style.display = 'none';
                         showPreview();
-                    });
+                    })
+                    .catch(err => { Swal.fire("Lỗi Đọc File", err.message, "error"); document.getElementById('loadingOverlay').style.display = 'none'; });
                 };
                 reader.readAsArrayBuffer(file);
             } else {
-                document.getElementById('loadingText').innerText = "Đang kích hoạt AI quét PDF/Ảnh...";
+                document.getElementById('loadingText').innerHTML = "Đang kích hoạt AI quét Ảnh/PDF...<br><small>(Chờ khoảng 15 giây)</small>";
                 let reader = new FileReader();
                 reader.onload = function(e) { goiAIBocTach({ type: "media", content: e.target.result.split(',')[1], mimeType: file.type }); };
                 reader.readAsDataURL(file);
             }
         };
 
+        // --- NÚT GỌI AI CHỮA CHÁY (MANUAL) ---
         window.refineWithAI = function() {
-            if (!tempRawHtml) return;
+            if (!tempRawHtml) return Swal.fire("Info", "Hỗ trợ dùng AI fix lỗi với file Word.", "info");
             Swal.fire({
-                title: 'Dùng AI Sửa Lỗi?',
-                text: "AI sẽ đọc lại để hiểu các câu sai form (Mất ~15s).",
-                showCancelButton: true, confirmButtonText: 'Quét bằng AI', confirmButtonColor: '#8b5cf6'
+                title: 'Kích hoạt AI Sửa Lỗi?',
+                text: "AI Gemini sẽ đọc và bóc tách lại toàn bộ (Mất khoảng 15s).",
+                icon: 'question', showCancelButton: true, confirmButtonText: 'Dùng AI', confirmButtonColor: '#8b5cf6'
             }).then((result) => {
                 if (result.isConfirmed) { goiAIBocTach({ type: "html", content: tempRawHtml }); }
             });
@@ -385,17 +438,17 @@
         async function goiAIBocTach(payload) {
             try {
                 document.getElementById('loadingOverlay').style.display = 'flex';
-                document.getElementById('loadingText').innerText = "AI đang suy nghĩ...";
+                document.getElementById('loadingText').innerText = "Vệ tinh AI đang phân tích dữ liệu...";
                 const res = await fetch('/api/tach-de', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
                 const data = await res.json();
                 if(data.error) throw new Error(data.error);
                 rawData.items = data;
                 showPreview();
-            } catch (e) { alert("Lỗi AI: " + e.message); }
+            } catch (e) { Swal.fire("Lỗi AI", e.message, "error"); }
             finally { document.getElementById('loadingOverlay').style.display = 'none'; }
         }
 
-        // --- GIAO DIỆN CHỈNH SỬA (CLONE AZOTA) ---
+        // --- CHỈNH SỬA & LƯU LÊN DATABASE (AZOTA UI CLONE) ---
         window.setCorrectOpt = function(qIdx, optIdx) {
             rawData.items[qIdx].options.forEach((o, j) => {
                 o.isCorrect = (j === optIdx);
@@ -416,22 +469,17 @@
             let html = '';
             rawData.items.forEach((item, i) => {
                 if(item.type === 'section') {
-                    html += `<div class="preview-section"><input type="text" id="sec-${i}" value="${item.text.replace(/"/g, '&quot;')}" style="background:transparent; border:none; padding:0; color:inherit; font-weight:inherit; font-size:inherit;"></div>`;
+                    html += `<div class="preview-section"><input type="text" id="sec-${i}" value="${item.text.replace(/"/g, '&quot;')}" style="font-size:20px; font-weight:800; background:transparent; border:none; padding:0; color:inherit;"></div>`;
                 } else {
                     let cleanQ = item.text.replace(/\[![a-z]+:\$(.*?)\$\]/g, '$1');
-                    html += `<div class="card" style="padding:20px;">
-                        <div style="display:flex; align-items:center; margin-bottom:10px; gap:10px;">
-                            <div style="border:1px solid #cbd5e1; padding:3px 10px; border-radius:15px; font-size:13px; color:#475569;">Nhập điểm</div>
-                            <div style="border:1px solid #cbd5e1; padding:3px 10px; border-radius:15px; font-size:13px; color:#475569;">Trắc nghiệm</div>
-                        </div>
-                        <textarea id="eq-${i}" style="font-weight:600; font-size:15px; min-height:50px; border-color:#e2e8f0; resize:vertical; padding:10px;">${cleanQ}</textarea>
-                        <div class="opt-group-${i}" style="margin-top:15px;">`;
-                    
+                    html += `<div class="card" style="padding:25px;">
+                        <textarea id="eq-${i}" style="font-weight:700; font-size:16px; min-height:50px; border-color:#e2e8f0; resize:vertical; margin-bottom:15px;">${cleanQ}</textarea>
+                        <div class="opt-group-${i}">`;
                     item.options.forEach((opt, j) => {
                         let isSel = opt.isCorrect;
                         html += `<div class="azota-opt-row">
                             <div class="azota-check-area" onclick="setCorrectOpt(${i}, ${j})">
-                                <i class="fa-solid fa-check" id="check-${i}-${j}" style="display:${isSel?'block':'none'}; font-size:20px;"></i>
+                                <i class="fa-solid fa-check" id="check-${i}-${j}" style="display:${isSel?'block':'none'};"></i>
                             </div>
                             <div class="azota-label-box ${isSel?'is-correct-box':''}" id="box-${i}-${j}" onclick="setCorrectOpt(${i}, ${j})">
                                 ${opt.label}
@@ -449,13 +497,16 @@
 
         document.getElementById('btnSaveToDatabase').onclick = async () => {
             document.getElementById('loadingOverlay').style.display = 'flex';
-            document.getElementById('loadingText').innerText = "Đang lưu...";
+            document.getElementById('loadingText').innerText = "Đang đồng bộ lên máy chủ Cloud...";
             
             rawData.items.forEach((item, i) => {
                 if(item.type === 'section') item.text = document.getElementById(`sec-${i}`).value;
                 else {
                     item.text = document.getElementById(`eq-${i}`).value;
-                    item.options.forEach((opt, j) => { opt.text = document.getElementById(`t-${i}-${j}`).value; });
+                    item.options.forEach((opt, j) => {
+                        opt.text = document.getElementById(`t-${i}-${j}`).value;
+                        // isCorrect đã được xử lý ở hàm setCorrectOpt
+                    });
                 }
             });
             try {
@@ -463,11 +514,12 @@
                 currentExamId = docRef.id;
                 document.getElementById('shareLink').value = window.location.origin + "?id=" + docRef.id;
                 document.getElementById('shareLinkArea').style.display = 'block';
-            } catch (e) { alert("Lỗi lưu"); }
+                Swal.fire({toast:true, position:'top-end', icon:'success', title:'Lưu thành công!', showConfirmButton:false, timer:2000});
+            } catch (e) { Swal.fire("Lỗi DB", e.message, "error"); }
             finally { document.getElementById('loadingOverlay').style.display = 'none'; }
         };
 
-        window.copyLink = () => { document.getElementById('shareLink').select(); document.execCommand('copy'); };
+        window.copyLink = () => { document.getElementById('shareLink').select(); document.execCommand('copy'); Swal.fire({toast:true, position:'top-end', icon:'success', title:'Đã Copy', showConfirmButton:false, timer:1500}); };
         window.startTestMode = function() { if(currentExamId) window.location.href = window.location.origin + "?id=" + currentExamId; };
 
         // --- GIAO DIỆN LÀM BÀI ---
@@ -482,18 +534,18 @@
         function startExamUI() { 
             userAns = {}; 
             switchScreen('screen-exam');
-            let html = `<h2 style="text-align:center; font-size:26px;">${rawData.title}</h2>
-                        <hr style="border:1px solid #e2e8f0; margin:20px 0;"/>`;
+            let mcqCount = rawData.items.filter(i=>i.type==='mcq').length;
+            let html = `<h2 style="text-align:center; font-size:28px;">${rawData.title}</h2>
+                        <div style="text-align:center; color:var(--text-muted); font-weight:700; margin-bottom:20px;">SỐ CÂU HỎI: ${mcqCount}</div><hr style="border:1px solid #e2e8f0; margin-bottom:25px;"/>`;
             
             rawData.items.forEach((item, i) => {
-                if(item.type === 'section') html += `<h3 style="margin-top:25px; border-bottom:2px solid var(--primary); padding-bottom:5px;">${item.text}</h3>`;
+                if(item.type === 'section') html += `<h3 style="margin-top:30px; border-bottom:3px solid var(--secondary); padding-bottom:8px; color:var(--secondary); text-transform:uppercase;">${item.text}</h3>`;
                 else {
-                    html += `<div style="margin-bottom:25px;">
-                        <b style="font-size:16px; line-height:1.6; display:block; margin-bottom:15px;">${item.text}</b>
-                        <div style="display:flex; flex-direction:column; gap:5px;">`;
+                    html += `<div class="card" style="padding:25px; box-shadow: 0 4px 6px rgba(0,0,0,0.03);">
+                        <b style="font-size:17px; line-height:1.5;">${item.text}</b><div style="margin-top:20px; display:flex; flex-direction:column; gap:5px;">`;
                     item.options.forEach((opt, j) => {
                         html += `<label class="opt-label" onclick="document.querySelectorAll('input[name=q-${i}]').forEach(r=>r.closest('label').classList.remove('selected')); this.classList.add('selected');">
-                        <input type="radio" name="q-${i}" onchange="userAns[${i}]=${j}" style="margin-top:3px; margin-right:12px; accent-color:var(--primary); width:18px; height:18px;"> 
+                        <input type="radio" name="q-${i}" onchange="userAns[${i}]=${j}" style="margin-top:4px; transform:scale(1.3); margin-right:12px; accent-color:var(--primary);"> 
                         <span style="flex:1; line-height:1.5;"><b>${opt.label}.</b> ${opt.text}</span></label>`;
                     });
                     html += `</div></div>`;
@@ -513,8 +565,9 @@
 
         window.submitTest = async function() {
             clearInterval(timer);
-            Swal.fire({ title: 'Đang nộp bài...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+            Swal.fire({ title: 'Đang chấm bài...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
             
+            let timeTaken = totalTimeSec - (timeLeftSec > 0 ? timeLeftSec : 0);
             let score = 0, totalMcq = 0;
             let reviewHtml = '';
 
@@ -522,17 +575,71 @@
                 if(item.type === 'mcq') {
                     totalMcq++;
                     let correctIdx = item.options.findIndex(o => o.isCorrect);
-                    let isTrue = (userAns[i] === correctIdx);
+                    let uAns = userAns[i];
+                    let isTrue = (uAns === correctIdx);
                     if(isTrue) score++;
+
+                    let statusCol = isTrue ? 'var(--correct)' : 'var(--wrong)';
+                    let bgCol = isTrue ? 'var(--correct-bg)' : 'var(--wrong-bg)';
+                    let icon = isTrue ? '<i class="fa-solid fa-circle-check"></i>' : '<i class="fa-solid fa-circle-xmark"></i>';
+                    
+                    reviewHtml += `<div style="padding:15px; border:2px solid ${statusCol}; margin-bottom:15px; background:white; border-radius:12px;">
+                        <div style="display:flex; gap:10px; margin-bottom:12px;">
+                            <div style="color:${statusCol}; font-size:20px; padding-top:2px;">${icon}</div>
+                            <b style="font-size:16px;">${item.text}</b>
+                        </div><div style="padding-left:35px;">`;
+                    
+                    item.options.forEach((opt, j) => {
+                        let c = ''; let marker = '';
+                        if (j === correctIdx) { c = `color:#065f46; font-weight:700; background:#d1fae5; border-radius:6px; padding:6px 10px;`; marker = '✓'; }
+                        else if (j === uAns && j !== correctIdx) { c = `color:#991b1b; text-decoration:line-through; background:#fee2e2; border-radius:6px; padding:6px 10px;`; marker = '✗'; }
+                        else c = `padding:6px 10px; color:var(--text-muted);`;
+                        
+                        reviewHtml += `<div style="${c} margin-bottom:5px; font-size:15px;"><span style="display:inline-block; width:20px; font-weight:900;">${marker}</span> <b>${opt.label}.</b> ${opt.text}</div>`;
+                    });
+                    reviewHtml += `</div></div>`;
                 }
             });
 
             let finalS = totalMcq > 0 ? ((score/totalMcq)*10).toFixed(2) : "0";
-            document.getElementById('scoreText').innerText = `Làm đúng: ${score} / ${totalMcq} câu`;
-            document.getElementById('finalScore').innerText = finalS;
+            document.getElementById('scoreText').innerText = `Làm đúng: ${score} / ${totalMcq} | TG: ${Math.floor(timeTaken/60)}p ${timeTaken%60}s`;
+            let fScoreEl = document.getElementById('finalScore');
+            fScoreEl.innerText = finalS; fScoreEl.style.color = (finalS >= 5) ? 'var(--correct)' : 'var(--wrong)';
             
+            document.getElementById('reviewRender').innerHTML = reviewHtml;
+
+            try {
+                await addDoc(collection(db, "exam_results"), { examId: currentExamId, name: currentUserName, score: parseFloat(finalS), timeTaken: timeTaken, date: new Date() });
+                loadLeaderboard();
+            } catch(e) { console.log(e); }
+
             Swal.close(); switchScreen('screen-result');
+            if (finalS >= 5) confetti({ particleCount: 200, spread: 80, origin: { y: 0.5 } });
         };
+
+        async function loadLeaderboard() {
+            const lbRender = document.getElementById('leaderboardRender');
+            try {
+                const q = query(collection(db, "exam_results"), where("examId", "==", currentExamId));
+                const querySnapshot = await getDocs(q);
+                let results = [];
+                querySnapshot.forEach((doc) => results.push(doc.data()));
+                results.sort((a, b) => b.score - a.score || a.timeTaken - b.timeTaken);
+                
+                if(results.length === 0) { lbRender.innerHTML = "<p>Chưa có ai thi.</p>"; return; }
+                
+                let lbHtml = '';
+                results.slice(0, 10).forEach((r, idx) => {
+                    let m = Math.floor(r.timeTaken/60); let s = r.timeTaken%60;
+                    lbHtml += `<div class="lb-row">
+                        <div style="flex:2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">#${idx+1} ${r.name}</div>
+                        <div style="flex:1; text-align:center;">${r.score} điểm</div>
+                        <div style="flex:1; text-align:right;">${m}p${s}s</div>
+                    </div>`;
+                });
+                lbRender.innerHTML = lbHtml;
+            } catch(e) { lbRender.innerHTML = "Lỗi tải bảng xếp hạng."; }
+        }
     </script>
 </body>
 </html>
