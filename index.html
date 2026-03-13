@@ -38,8 +38,13 @@
         .btn { background: var(--primary); color: white; border: none; padding: 14px 24px; font-size: 16px; font-weight: 700; border-radius: 10px; cursor: pointer; display: inline-flex; gap: 8px; align-items: center; justify-content: center; transition: all 0.2s ease; width: 100%; box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2); }
         .btn:hover { background: var(--primary-hover); transform: translateY(-2px); box-shadow: 0 6px 12px rgba(37, 99, 235, 0.3); }
         .btn-success { background: var(--correct); box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2); } .btn-success:hover { background: #059669; }
-        .btn-outline { background: white; border: 2px solid var(--primary); color: var(--primary); box-shadow: none; } .btn-outline:hover { background: #eef2ff; transform: translateY(0); }
         
+        .btn-outline { background: white; border: 2px solid var(--primary); color: var(--primary); box-shadow: none; } 
+        .btn-outline:hover { background: #eff6ff; transform: translateY(0); }
+        
+        .btn-ai { background: white; border: 2px solid #8b5cf6; color: #8b5cf6; box-shadow: none; }
+        .btn-ai:hover { background: #f3e8ff; border-color: #7c3aed; color: #7c3aed; transform: translateY(0); }
+
         .upload-area { border: 3px dashed #cbd5e1; padding: 60px 20px; text-align: center; border-radius: var(--radius); cursor: pointer; background: #f8fafc; margin-bottom: 20px; transition: 0.3s; }
         .upload-area:hover { border-color: var(--primary); background: #eff6ff; }
         .upload-area i { font-size: 60px; color: var(--primary); margin-bottom: 15px; opacity: 0.8;}
@@ -85,9 +90,9 @@
 </head>
 <body>
 
-    <div id="loadingOverlay" style="position: fixed; inset:0; background:rgba(255, 255, 255, 0.9); z-index: 30000; display: none; flex-direction: column; align-items: center; justify-content: center;">
+    <div id="loadingOverlay" style="position: fixed; inset:0; background:rgba(255, 255, 255, 0.95); z-index: 30000; display: none; flex-direction: column; align-items: center; justify-content: center;">
         <i class="fa-solid fa-spinner fa-spin" style="font-size: 60px; color: var(--primary); margin-bottom: 20px;"></i>
-        <h2 style="color: var(--primary); text-align: center; font-weight: 800;" id="loadingText">Hệ Thống Đang Xử Lý...</h2>
+        <h2 style="color: var(--primary); text-align: center; font-weight: 800;" id="loadingText">Đang xử lý...</h2>
     </div>
 
     <div id="authOverlay">
@@ -116,13 +121,13 @@
         </div>
 
         <div id="screen-setup" class="app-screen card">
-            <h2 style="text-align: center; font-size: 32px;">Trình Tạo Đề Thông Minh</h2>
-            <p style="text-align: center; color: var(--text-muted); margin-bottom: 30px; font-weight: 600;">Động cơ thế hệ 4.0: Bẻ dòng tự động, nhận diện (*), (Đ)/(S), In đậm.</p>
+            <h2 style="text-align: center; font-size: 32px;">Hệ Thống Bóc Tách Đề</h2>
+            <p style="text-align: center; color: var(--text-muted); margin-bottom: 30px; font-weight: 600;">Quyền quyết định ở bạn: Quét nhanh bằng Regex hoặc Quét sâu bằng AI.</p>
             
             <div class="upload-area" onclick="document.getElementById('fileUpload').click()">
                 <i class="fa-solid fa-file-word"></i>
-                <h3 id="fileNameDisplay" style="color: var(--text-main); font-size: 22px; margin-bottom: 5px;">Tải đề thi lên đây (Word, PDF, Ảnh)</h3>
-                <p style="color: var(--text-muted); font-weight: 600; margin:0;">Thuật toán sẽ tự động phân loại cấu trúc.</p>
+                <h3 id="fileNameDisplay" style="color: var(--text-main); font-size: 22px; margin-bottom: 5px;">Tải đề thi (.docx) lên đây</h3>
+                <p style="color: var(--text-muted); font-weight: 600; margin:0;">Cấu trúc chuẩn: Câu 1:, A., *B.</p>
                 <input type="file" id="fileUpload" accept=".docx, .pdf, image/*" style="display: none;" onchange="document.getElementById('fileNameDisplay').innerText = this.files[0].name">
             </div>
             
@@ -130,18 +135,26 @@
                 <div><label style="font-weight:700; color: var(--text-muted); margin-bottom: 8px; display: block;">Tên Bài Thi:</label><input type="text" id="examName" placeholder="VD: Kiểm tra Toán 11"></div>
                 <div><label style="font-weight:700; color: var(--text-muted); margin-bottom: 8px; display: block;">Thời Gian (Phút):</label><input type="number" id="examTime" value="45"></div>
             </div>
-            <button class="btn" style="padding: 18px; font-size: 18px;" onclick="processFile()"><i class="fa-solid fa-bolt"></i> BẮT ĐẦU BÓC TÁCH</button>
+            
+            <div style="display: flex; gap: 15px;">
+                <button class="btn" style="flex: 2; padding: 18px; font-size: 18px;" onclick="processFile('regex')">
+                    <i class="fa-solid fa-bolt"></i> QUÉT CHUẨN AZOTA (0.1s)
+                </button>
+                <button class="btn btn-ai" style="flex: 1; padding: 18px; font-size: 16px;" onclick="processFile('ai')">
+                    <i class="fa-solid fa-robot"></i> DÙNG AI (15s)
+                </button>
+            </div>
+            <p style="text-align: center; color: var(--text-muted); font-size: 13px; margin-top: 15px;">*Chỉ dùng AI khi đề PDF/Ảnh hoặc Word bị sai form nặng.</p>
         </div>
 
         <div id="screen-preview" class="app-screen card">
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;">
                 <button class="btn btn-outline" style="width: auto;" onclick="switchScreen('screen-setup')"><i class="fa-solid fa-arrow-left"></i> Quay lại</button>
                 <h2 style="margin:0; font-size: 26px;">Kiểm Tra Dữ Liệu</h2>
-                <button class="btn" style="width: auto; background: #8b5cf6;" onclick="refineWithAI()"><i class="fa-solid fa-robot"></i> Nhờ AI Fix Lỗi Tự Động</button>
             </div>
             
             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #e2e8f0;">
-                <div style="background: var(--azota-blue-bg); padding: 8px 12px; border-radius: 6px; font-weight: bold; color: var(--azota-blue);"><i class="fa-solid fa-info-circle"></i> Mẹo</div>
+                <div style="background: var(--azota-blue-bg); padding: 8px 12px; border-radius: 6px; font-weight: bold; color: var(--azota-blue);"><i class="fa-solid fa-info-circle"></i> Azota UI</div>
                 <div style="color: var(--text-muted); font-size: 15px; font-weight: 600;">Click vào ô chữ (A, B, C, D) để đổi đáp án đúng thủ công.</div>
             </div>
             
@@ -230,96 +243,48 @@
             window.scrollTo(0,0);
         };
 
-        // --- BỘ LỌC REGEX THẾ HỆ 4.0: AZOTA CLONE HOÀN HẢO ---
-        function parseWordToExam(htmlString) {
+        // --- ĐỘNG CƠ REGEX THUẦN AZOTA (SIÊU TỐC, KHÔNG AI) ---
+        function parseWordToExamRaw(rawText) {
             let items = [];
             
-            // 1. Tiền xử lý: Bảo toàn bôi đậm/gạch chân thành Text tàng hình
-            let processedHtml = htmlString
-                .replace(/<strong>(.*?)<\/strong>/gi, ' [!b:$1$] ')
-                .replace(/<b>(.*?)<\/b>/gi, ' [!b:$1$] ')
-                .replace(/<u>(.*?)<\/u>/gi, ' [!u:$1$] ')
-                .replace(/<\/p>/gi, '\n')
-                .replace(/<br\s*\/?>/gi, '\n')
-                .replace(/<\/div>/gi, '\n');
+            // Lọc bỏ ký tự rác tàng hình
+            let cleanText = rawText.replace(/[\u200B-\u200D\uFEFF]/g, '');
 
-            let tempDiv = document.createElement('div');
-            tempDiv.innerHTML = processedHtml;
-            let rawText = tempDiv.textContent || tempDiv.innerText;
-            
-            // XÓA KÝ TỰ TÀNG HÌNH (Gây lỗi Regex)
-            rawText = rawText.replace(/[\u200B-\u200D\uFEFF]/g, '');
-
-            // CHỐNG DÍNH DÒNG CỰC MẠNH: Tự động chèn Enter trước A. B. C. D. dù dính chùm
-            let cleanText = rawText.replace(/(\s+)(\*?\s*(?:\[![bu]:\$)?\s*[A-D][\.\:\)](?:\$\])?)/gi, '\n$2');
+            // BẺ DÒNG THẦN THÁNH: Tự động tách A, B, C, D nằm ngang thành dọc
+            cleanText = cleanText.replace(/(\s+)(\*?\s*[A-D][\.\:\)])/gi, '\n$2');
 
             let lines = cleanText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
             let currentItem = null;
 
             for (let line of lines) {
-                // Lọc sạch text thô để Test điều kiện
-                let rawLineToTest = line.replace(/\[![a-z]+:\$(.*?)\$\]/g, '$1').trim();
-
-                // 1. Nhận diện PHẦN / SECTION
-                if (/^(PHẦN|I\.|II\.|III\.|IV\.|V\.)\s+/i.test(rawLineToTest)) {
-                    items.push({ type: 'section', text: rawLineToTest });
+                // Nhận diện TIÊU ĐỀ PHẦN
+                if (/^(PHẦN|I\.|II\.|III\.|IV\.|V\.)\s+/i.test(line)) {
+                    items.push({ type: 'section', text: line });
                     currentItem = null;
                     continue;
                 }
 
-                // 2. Nhận diện CÂU HỎI (BẤT CHẤP LỖI CÚ PHÁP)
-                if (/^(Câu|Bài|Question)\s*\d+/i.test(rawLineToTest)) {
+                // Nhận diện CÂU HỎI (Câu 1, Bài 1)
+                if (/^(Câu|Bài)\s*\d+[\:\.]?/i.test(line)) {
                     if (currentItem) items.push(currentItem);
                     currentItem = { type: 'mcq', text: line, options: [] };
                     continue;
                 }
 
-                // 3. Xử lý dòng chứa đáp án (Bóc tách A., B., C., D.)
-                let tokens = line.split(/(\*?\s*(?:\[![bu]:\$)?\s*[A-D]\s*[\.\:\)](?:\$\])?|\*?\s*[a-d]\))/i);
-
-                if (tokens.length > 1 && currentItem) {
-                    if (tokens[0].trim()) {
-                        let txt = tokens[0].trim();
-                        if (currentItem.options.length === 0) currentItem.text += '\n' + txt;
-                        else currentItem.options[currentItem.options.length - 1].text += '\n' + txt;
-                    }
-
-                    for (let j = 1; j < tokens.length; j += 2) {
-                        let marker = tokens[j].trim();
-                        let content = (tokens[j+1] || "").trim();
-                        
-                        let isStarred = marker.startsWith('*'); 
-                        let cleanLabel = marker.replace(/[\*\.\:\)\[\]\!\$\w]/g, '').trim().toUpperCase(); 
-                        // Sửa lỗi regex cleanLabel: chỉ giữ lại chữ cái A,B,C,D
-                        let letterMatch = marker.match(/[A-D]/i);
-                        if(letterMatch) cleanLabel = letterMatch[0].toUpperCase();
-
-                        let isCorrect = isStarred;
-
-                        // Logic nhận diện (Đ) / (S) và In đậm đáp án
-                        let rawContentTest = content.replace(/\[![a-z]+:\$(.*?)\$\]/g, '$1').toUpperCase();
-                        
-                        // Check bôi đậm nguyên marker (VD: [!b:$A.$])
-                        if(marker.includes('[!b:$') || marker.includes('[!u:$')) isCorrect = true;
-
-                        if (rawContentTest.includes('(Đ)') || rawContentTest.includes('[Đ]') || rawContentTest.endsWith(' Đ') || /\[!b:\$Đ\$\]/i.test(content)) {
-                            isCorrect = true;
-                            content = content.replace(/\[!b:\$Đ\$\]|\(Đ\)|\[Đ\]| Đ$/gi, '').trim();
-                        } else if (rawContentTest.includes('(S)') || rawContentTest.includes('[S]') || rawContentTest.endsWith(' S') || /\[!b:\$S\$\]/i.test(content)) {
-                            isCorrect = false; 
-                            content = content.replace(/\[!b:\$S\$\]|\(S\)|\[S\]| S$/gi, '').trim();
-                        } else if (/\[![bu]:\$(.*?)\$\]/.test(content)) {
-                            isCorrect = true; // In đậm cả câu đáp án
-                        }
-
-                        content = content.replace(/\[![a-z]+:\$(.*?)\$\]/g, '$1').trim();
-                        currentItem.options.push({ label: cleanLabel, text: content, isCorrect: isCorrect });
-                    }
-                } 
+                // Nhận diện ĐÁP ÁN (*A., B.)
+                let optMatch = line.match(/^(\*?)\s*([A-D])[\.\:\)]\s*(.*)$/i);
+                
+                if (optMatch && currentItem) {
+                    let isStarred = optMatch[1] === '*';
+                    let label = optMatch[2].toUpperCase();
+                    let content = optMatch[3].trim();
+                    
+                    currentItem.options.push({ label: label, text: content, isCorrect: isStarred });
+                }
                 else if (currentItem) {
-                    let cleanCont = line.replace(/\[![a-z]+:\$(.*?)\$\]/g, '$1');
-                    if (currentItem.options.length === 0) { currentItem.text += '\n' + cleanCont; }
-                    else { currentItem.options[currentItem.options.length - 1].text += '\n' + cleanCont; }
+                    // Dòng thường thì nối vào câu hỏi/đáp án
+                    if (currentItem.options.length === 0) currentItem.text += '\n' + line;
+                    else currentItem.options[currentItem.options.length - 1].text += '\n' + line;
                 }
             }
             if (currentItem) items.push(currentItem);
@@ -357,15 +322,6 @@
                 document.getElementById('authOverlay').style.display = 'none';
                 document.getElementById('mainApp').style.display = 'block';
                 document.getElementById('userEmailDisplay').innerText = currentUserName;
-                
-                if (!sessionStorage.getItem('welcomed')) {
-                    Swal.fire({
-                        title: "CHÀO MỪNG ĐẾN AZOTA PRO",
-                        html: "<div style='line-height:1.6; text-align:left;'><b>Hệ thống Động cơ Kép (Regex + AI)</b><br><br>Cập nhật tính năng Bẻ dòng tự động và Giao diện chấm mượt mà.<br>Mọi góp ý vui lòng Zalo Admin: <b style='color:var(--primary);'>0328583859 (Thành Phúc)</b></div>",
-                        icon: "info", confirmButtonColor: "#4f46e5"
-                    });
-                    sessionStorage.setItem('welcomed', 'true');
-                }
 
                 const urlParams = new URLSearchParams(window.location.search);
                 currentExamId = urlParams.get('id');
@@ -382,73 +338,86 @@
 
         document.getElementById('btnLogout').onclick = () => { signOut(auth); };
 
-        // --- XỬ LÝ FILE (TỰ ĐỘNG CHUYỂN AI NẾU REGEX BÓ TAY) ---
-        window.processFile = function() {
+        // --- XỬ LÝ FILE (CHIA LÀM 2 NÚT RÕ RÀNG) ---
+        window.processFile = function(mode) {
             let file = document.getElementById('fileUpload').files[0];
             if (!file) return Swal.fire("Lỗi", "Bạn chưa chọn file để bóc tách!", "warning");
             
             rawData.title = document.getElementById('examName').value || "Bài Tập Trắc Nghiệm";
             rawData.time = parseInt(document.getElementById('examTime').value) || 45;
 
-            document.getElementById('loadingOverlay').style.display = 'flex';
-            
-            if (file.name.endsWith('.docx')) {
-                document.getElementById('loadingText').innerHTML = "Đang cắt dòng và tách đáp án tự động...<br><small>(Tốc độ 0.1s)</small>";
-                let reader = new FileReader();
-                reader.onload = function(e) {
-                    mammoth.convertToHtml({arrayBuffer: e.target.result}, { styleMap: ["b => b", "strong => b", "u => u"] })
-                    .then(result => {
-                        tempRawHtml = result.value; 
-                        let extractedItems = parseWordToExam(result.value);
-                        
-                        // FALLBACK AI:
-                        if(extractedItems.length === 0) {
-                            document.getElementById('loadingText').innerHTML = "Cấu trúc đề hơi dị. Đang tự động chuyển sang AI nhận diện...<br><small>(Chờ khoảng 15s)</small>";
-                            goiAIBocTach({ type: "html", content: tempRawHtml });
-                            return; 
-                        }
-
-                        rawData.items = extractedItems;
-                        document.getElementById('loadingOverlay').style.display = 'none';
-                        showPreview();
-                    })
-                    .catch(err => { Swal.fire("Lỗi Đọc File", err.message, "error"); document.getElementById('loadingOverlay').style.display = 'none'; });
-                };
-                reader.readAsArrayBuffer(file);
-            } else {
-                document.getElementById('loadingText').innerHTML = "Đang kích hoạt AI quét Ảnh/PDF...<br><small>(Chờ khoảng 15 giây)</small>";
-                let reader = new FileReader();
-                reader.onload = function(e) { goiAIBocTach({ type: "media", content: e.target.result.split(',')[1], mimeType: file.type }); };
-                reader.readAsDataURL(file);
+            // NẾU NGƯỜI DÙNG BẤM NÚT QUÉT AI
+            if (mode === 'ai') {
+                if (file.name.endsWith('.docx')) {
+                    document.getElementById('loadingOverlay').style.display = 'flex';
+                    document.getElementById('loadingText').innerText = "Đang gửi nội dung cho AI phân tích (15s)...";
+                    let reader = new FileReader();
+                    reader.onload = function(e) {
+                        mammoth.convertToHtml({arrayBuffer: e.target.result})
+                        .then(result => { goiAIBocTach({ type: "html", content: result.value }); });
+                    };
+                    reader.readAsArrayBuffer(file);
+                } else {
+                    document.getElementById('loadingOverlay').style.display = 'flex';
+                    document.getElementById('loadingText').innerText = "AI đang đọc Ảnh/PDF (15s)...";
+                    let reader = new FileReader();
+                    reader.onload = function(e) { goiAIBocTach({ type: "media", content: e.target.result.split(',')[1], mimeType: file.type }); };
+                    reader.readAsDataURL(file);
+                }
+                return;
             }
-        };
 
-        // --- NÚT GỌI AI CHỮA CHÁY (MANUAL) ---
-        window.refineWithAI = function() {
-            if (!tempRawHtml) return Swal.fire("Info", "Hỗ trợ dùng AI fix lỗi với file Word.", "info");
-            Swal.fire({
-                title: 'Kích hoạt AI Sửa Lỗi?',
-                text: "AI Gemini sẽ đọc và bóc tách lại toàn bộ (Mất khoảng 15s).",
-                icon: 'question', showCancelButton: true, confirmButtonText: 'Dùng AI', confirmButtonColor: '#8b5cf6'
-            }).then((result) => {
-                if (result.isConfirmed) { goiAIBocTach({ type: "html", content: tempRawHtml }); }
-            });
+            // NẾU NGƯỜI DÙNG BẤM NÚT REGEX (MẶC ĐỊNH - AZOTA)
+            if (!file.name.endsWith('.docx')) {
+                return Swal.fire("Sai định dạng", "Chế độ quét siêu tốc chỉ hỗ trợ file Word (.docx). Hãy bấm nút Dùng AI nếu bạn muốn quét PDF/Ảnh.", "error");
+            }
+
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            document.getElementById('loadingText').innerText = "Đang quét siêu tốc (0.1s)...";
+            
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                // Lấy Raw Text thuần túy cực nhanh
+                mammoth.extractRawText({arrayBuffer: e.target.result})
+                .then(result => {
+                    let extractedItems = parseWordToExamRaw(result.value);
+                    
+                    document.getElementById('loadingOverlay').style.display = 'none';
+
+                    // LỖI FORM -> BÁO LỖI NGAY, KHÔNG TỰ GỌI AI
+                    if(extractedItems.length === 0) {
+                        Swal.fire({
+                            title: "Lỗi cấu trúc đề!",
+                            text: "Không tìm thấy cấu trúc 'Câu 1:' hoặc 'A.'. Bạn hãy sửa lại file Word, hoặc bấm nút [DÙNG AI] để máy tự động hiểu.",
+                            icon: "error",
+                            confirmButtonColor: '#2563eb'
+                        });
+                        return; 
+                    }
+
+                    rawData.items = extractedItems;
+                    showPreview();
+                })
+                .catch(err => { 
+                    Swal.fire("Lỗi Đọc File", err.message, "error"); 
+                    document.getElementById('loadingOverlay').style.display = 'none'; 
+                });
+            };
+            reader.readAsArrayBuffer(file);
         };
 
         async function goiAIBocTach(payload) {
             try {
-                document.getElementById('loadingOverlay').style.display = 'flex';
-                document.getElementById('loadingText').innerText = "Vệ tinh AI đang phân tích dữ liệu...";
                 const res = await fetch('/api/tach-de', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
                 const data = await res.json();
                 if(data.error) throw new Error(data.error);
                 rawData.items = data;
                 showPreview();
-            } catch (e) { Swal.fire("Lỗi AI", e.message, "error"); }
+            } catch (e) { Swal.fire("Lỗi kết nối AI", e.message, "error"); }
             finally { document.getElementById('loadingOverlay').style.display = 'none'; }
         }
 
-        // --- CHỈNH SỬA & LƯU LÊN DATABASE (AZOTA UI CLONE) ---
+        // --- CHỈNH SỬA UI CLONE AZOTA ---
         window.setCorrectOpt = function(qIdx, optIdx) {
             rawData.items[qIdx].options.forEach((o, j) => {
                 o.isCorrect = (j === optIdx);
@@ -471,9 +440,8 @@
                 if(item.type === 'section') {
                     html += `<div class="preview-section"><input type="text" id="sec-${i}" value="${item.text.replace(/"/g, '&quot;')}" style="font-size:20px; font-weight:800; background:transparent; border:none; padding:0; color:inherit;"></div>`;
                 } else {
-                    let cleanQ = item.text.replace(/\[![a-z]+:\$(.*?)\$\]/g, '$1');
                     html += `<div class="card" style="padding:25px;">
-                        <textarea id="eq-${i}" style="font-weight:700; font-size:16px; min-height:50px; border-color:#e2e8f0; resize:vertical; margin-bottom:15px;">${cleanQ}</textarea>
+                        <textarea id="eq-${i}" style="font-weight:700; font-size:16px; min-height:50px; border-color:#e2e8f0; resize:vertical; margin-bottom:15px;">${item.text}</textarea>
                         <div class="opt-group-${i}">`;
                     item.options.forEach((opt, j) => {
                         let isSel = opt.isCorrect;
@@ -505,7 +473,6 @@
                     item.text = document.getElementById(`eq-${i}`).value;
                     item.options.forEach((opt, j) => {
                         opt.text = document.getElementById(`t-${i}-${j}`).value;
-                        // isCorrect đã được xử lý ở hàm setCorrectOpt
                     });
                 }
             });
