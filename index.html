@@ -3,151 +3,176 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Hệ Thống Thi Trắc Nghiệm Pro - TH4NHPHVC</title>
+    <title>Hệ Thống Thi Trắc Nghiệm - TH4NHPHVC</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     
     <style>
-        /* GIAO DIỆN VIBE CODE - FLAT, DARK, NEON */
+        /* GIAO DIỆN KIỂU VS CODE / GITHUB DARK - Sạch, Chuyên nghiệp */
         :root { 
-            --bg-body: #0f172a; --bg-card: #1e293b; --bg-input: #0f172a;
-            --primary: #0ea5e9; --primary-hover: #0284c7; --primary-glow: rgba(14, 165, 233, 0.4);
-            --secondary: #8b5cf6; --secondary-hover: #7c3aed;
-            --text-main: #f8fafc; --text-muted: #94a3b8; 
-            --correct: #10b981; --correct-bg: rgba(16, 185, 129, 0.1);
-            --wrong: #ef4444; --wrong-bg: rgba(239, 68, 68, 0.1);
-            --border: #334155; 
-            --radius: 12px; 
-            --font-code: 'Fira Code', monospace;
+            --bg-body: #0d1117;       /* Nền đen dịu mắt */
+            --bg-card: #161b22;       /* Nền thẻ xám đen */
+            --bg-input: #010409;      /* Ô nhập liệu */
+            --border: #30363d;        /* Viền tinh tế */
+            --primary: #58a6ff;       /* Màu xanh dương GitHub */
+            --primary-hover: #3182ce;
+            --secondary: #8b5cf6; 
+            --text-main: #c9d1d9;     /* Màu chữ trắng xám */
+            --text-muted: #8b949e; 
+            --correct: #238636;       /* Xanh lá đúng */
+            --correct-bg: rgba(35, 134, 54, 0.15);
+            --wrong: #da3633;         /* Đỏ sai */
+            --wrong-bg: rgba(218, 54, 51, 0.15);
+            --radius: 8px;            /* Bo góc nhẹ nhàng */
             --font-ui: 'Inter', sans-serif;
+            --font-code: 'JetBrains Mono', monospace;
         }
         * { box-sizing: border-box; }
         
         body { font-family: var(--font-ui); background: var(--bg-body); color: var(--text-main); margin: 0; padding: 20px; min-height: 100vh;}
         .container { max-width: 1000px; margin: auto; position: relative; }
         
-        .card { background: var(--bg-card); border-radius: var(--radius); padding: 30px; margin-bottom: 25px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        h2, h3 { margin-top: 0; color: var(--text-main); font-weight: 800; letter-spacing: -0.5px; }
-        .text-glow { text-shadow: 0 0 10px var(--primary-glow); color: var(--primary); }
+        /* Box và Card gọn gàng */
+        .card { background: var(--bg-card); border-radius: var(--radius); padding: 30px; margin-bottom: 20px; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        h2, h3 { margin-top: 0; color: #ffffff; font-weight: 600; }
         
-        input[type="text"], input[type="number"], input[type="password"], input[type="email"], textarea { width: 100%; padding: 14px 18px; margin-bottom: 15px; border: 1px solid var(--border); border-radius: 8px; font-family: var(--font-ui); font-size: 15px; color: var(--text-main); background: var(--bg-input); transition: 0.2s;}
-        input:focus, textarea:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px var(--primary-glow); }
+        /* Input & Form */
+        input[type="text"], input[type="number"], input[type="password"], input[type="email"], textarea { width: 100%; padding: 12px 16px; margin-bottom: 12px; border: 1px solid var(--border); border-radius: 6px; font-family: var(--font-ui); font-size: 15px; color: var(--text-main); background: var(--bg-input); transition: 0.2s; line-height: 1.5;}
+        input:focus, textarea:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.3); }
         
-        .btn { background: var(--primary); color: white; border: 1px solid transparent; padding: 12px 20px; font-size: 15px; font-weight: 600; font-family: var(--font-code); border-radius: 8px; cursor: pointer; display: inline-flex; gap: 8px; align-items: center; justify-content: center; transition: 0.2s; width: 100%; text-transform: uppercase;}
-        .btn:hover { background: var(--primary-hover); box-shadow: 0 0 15px var(--primary-glow); }
-        .btn-secondary { background: var(--secondary); } .btn-secondary:hover { background: var(--secondary-hover); box-shadow: 0 0 15px rgba(139, 92, 246, 0.4); }
-        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-main); } .btn-outline:hover { border-color: var(--primary); color: var(--primary); background: rgba(14, 165, 233, 0.05);}
+        /* Buttons - Phẳng, thanh lịch */
+        .btn { background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border); padding: 12px 20px; font-size: 14px; font-weight: 600; border-radius: 6px; cursor: pointer; display: inline-flex; gap: 8px; align-items: center; justify-content: center; transition: 0.2s; width: 100%; font-family: var(--font-ui);}
+        .btn:hover { background: #30363d; border-color: #8b949e; }
         
-        .upload-area { border: 2px dashed var(--border); padding: 50px 20px; text-align: center; border-radius: var(--radius); cursor: pointer; background: rgba(15, 23, 42, 0.5); margin-bottom: 20px; transition: 0.3s; }
-        .upload-area:hover { border-color: var(--primary); background: rgba(14, 165, 233, 0.05); }
-        .upload-area i { font-size: 50px; color: var(--primary); margin-bottom: 15px; }
+        .btn-primary { background: var(--correct); color: white; border: 1px solid rgba(240, 246, 252, 0.1); }
+        .btn-primary:hover { background: #2ea043; border-color: rgba(240, 246, 252, 0.1); }
         
-        #authOverlay { position: fixed; inset:0; background:rgba(15, 23, 42, 0.95); z-index: 20000; display: none; align-items: center; justify-content: center; }
-        .auth-card { background: var(--bg-card); padding: 40px; border-radius: 16px; width: 90%; max-width: 400px; border: 1px solid var(--border); text-align: center; box-shadow: 0 0 40px rgba(0,0,0,0.8);}
+        .btn-ai { background: transparent; color: var(--secondary); border: 1px solid var(--secondary); font-family: var(--font-code);}
+        .btn-ai:hover { background: rgba(139, 92, 246, 0.1); }
+        
+        /* Khu vực Upload - Vibe IDE */
+        .upload-area { border: 1px dashed var(--border); padding: 40px 20px; text-align: center; border-radius: var(--radius); cursor: pointer; background: var(--bg-input); margin-bottom: 15px; transition: 0.2s; }
+        .upload-area:hover { border-color: var(--primary); }
+        .upload-area i { font-size: 40px; color: var(--text-muted); margin-bottom: 10px; }
+        
+        #authOverlay { position: fixed; inset:0; background:rgba(1, 4, 9, 0.9); z-index: 20000; display: none; align-items: center; justify-content: center; }
+        .auth-card { background: var(--bg-card); padding: 40px; border-radius: 12px; width: 90%; max-width: 400px; border: 1px solid var(--border); text-align: center; }
         
         .app-screen { display: none; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Preview UI */
-        .ans-row { display: flex; align-items: center; gap: 10px; margin-top: 8px; padding: 10px; border-radius: 8px; font-weight: 600; border: 1px solid var(--border); background: var(--bg-input);}
-        .ans-row.is-correct-row { border-color: var(--correct); background: var(--correct-bg); color: var(--correct);}
+        /* UI Trắc Nghiệm - Nhìn rõ, không rối mắt */
+        .preview-section { font-size: 18px; color: var(--primary); font-weight: 600; border-bottom: 1px solid var(--border); padding-bottom: 8px; margin: 25px 0 15px 0;}
+        .ans-row { display: flex; align-items: flex-start; gap: 10px; margin-top: 8px; padding: 10px; border-radius: 6px; font-weight: 500; border: 1px solid transparent; transition: 0.2s;}
+        .ans-row:hover { background: var(--bg-input); }
+        .ans-row.is-correct-row { border-color: var(--correct); background: var(--correct-bg); }
+        .ans-row.is-wrong-row { border-color: var(--wrong); background: var(--wrong-bg); }
         
-        /* Exam UI */
-        .opt-label { display: flex; align-items: flex-start; padding: 15px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: 0.2s; background: var(--bg-input); margin-bottom: 10px; font-weight: 600;}
-        .opt-label:hover { border-color: var(--primary); }
-        .opt-label.selected { border-color: var(--primary); background: var(--primary-glow); }
+        .opt-label { display: flex; align-items: flex-start; padding: 14px; border: 1px solid var(--border); border-radius: 6px; cursor: pointer; transition: 0.2s; background: var(--bg-card); margin-bottom: 8px;}
+        .opt-label:hover { border-color: #8b949e; background: #21262d; }
+        .opt-label.selected { border-color: var(--primary); background: rgba(88, 166, 255, 0.1); }
         
         /* Leaderboard */
-        .lb-row { display: flex; justify-content: space-between; padding: 12px 15px; border-bottom: 1px solid var(--border); font-family: var(--font-code); font-size: 14px;}
-        .lb-row:nth-child(1) { color: #fbbf24; font-weight: bold; font-size: 16px;}
-        .lb-row:nth-child(2) { color: #cbd5e1; }
-        .lb-row:nth-child(3) { color: #b45309; }
+        .lb-row { display: flex; justify-content: space-between; padding: 10px 15px; border-bottom: 1px solid var(--border); font-family: var(--font-code); font-size: 13px; background: var(--bg-input); border-radius: 6px; margin-bottom: 5px;}
+        .lb-row.top-1 { color: #d2a8ff; font-weight: bold; border: 1px solid rgba(210, 168, 255, 0.3); }
 
-        .top-bar { display: flex; justify-content: space-between; align-items: center; background: var(--bg-card); padding: 15px 25px; border-radius: var(--radius); margin-bottom: 20px; border: 1px solid var(--border); }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; background: var(--bg-card); padding: 12px 20px; border-radius: var(--radius); margin-bottom: 20px; border: 1px solid var(--border); }
+
+        .tag { font-family: var(--font-code); font-size: 12px; padding: 3px 8px; background: #21262d; border-radius: 12px; border: 1px solid var(--border); color: var(--text-muted); }
 
         @media (max-width: 768px) {
             body { padding: 10px; }
-            .card { padding: 20px; }
+            .card { padding: 15px; }
             #exam-layout { flex-direction: column-reverse !important; gap: 15px !important; }
-            #timer-card { width: 100% !important; position: sticky !important; top: 5px !important; z-index: 100; padding: 10px 15px !important; display: flex; justify-content: space-between; align-items: center; }
-            #timerDisplay { font-size: 24px !important; margin: 0 !important; }
-            #btnSubmitExam { width: auto !important; padding: 8px 15px; font-size: 13px; }
+            #timer-card { width: 100% !important; position: sticky !important; top: 5px !important; z-index: 100; padding: 12px !important; display: flex; justify-content: space-between; align-items: center; }
+            #timerDisplay { font-size: 20px !important; margin: 0 !important; }
+            #btnSubmitExam { width: auto !important; padding: 8px 12px; font-size: 13px; }
+            .upload-area { padding: 30px 10px; }
         }
     </style>
 </head>
 <body>
 
-    <div id="loadingOverlay" style="position: fixed; inset:0; background:rgba(15, 23, 42, 0.95); z-index: 30000; display: none; flex-direction: column; align-items: center; justify-content: center;">
-        <i class="fa-solid fa-terminal fa-fade" style="font-size: 60px; color: var(--primary); margin-bottom: 20px;"></i>
-        <h3 style="color: var(--text-main); font-family: var(--font-code); text-align: center;" id="loadingText">Executing.Engine()...</h3>
+    <div id="loadingOverlay" style="position: fixed; inset:0; background:rgba(1, 4, 9, 0.9); z-index: 30000; display: none; flex-direction: column; align-items: center; justify-content: center;">
+        <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 40px; color: var(--primary); margin-bottom: 15px;"></i>
+        <div style="color: var(--text-main); font-family: var(--font-code); font-size: 14px;" id="loadingText">Processing data...</div>
     </div>
 
     <div id="authOverlay">
         <div class="auth-card">
-            <h2 id="authTitle" class="text-glow">SYSTEM.LOGIN()</h2>
-            <p style="color: var(--text-muted); margin-bottom: 25px; font-family: var(--font-code); font-size: 13px;">> Dev: TH4NHPHVC (11A11)</p>
-            <input type="email" id="authEmail" placeholder="user@email.com">
-            <input type="password" id="authPassword" placeholder="••••••••">
+            <h2 style="font-size: 24px; margin-bottom: 5px;">Hệ Thống Trắc Nghiệm</h2>
+            <p style="color: var(--text-muted); margin-bottom: 25px; font-size: 14px;">Developer: TH4NHPHVC (11A11)</p>
+            <input type="email" id="authEmail" placeholder="Địa chỉ Email">
+            <input type="password" id="authPassword" placeholder="Mật khẩu (Tối thiểu 6 ký tự)">
             <div style="margin: 15px 0; display: flex; justify-content: center;">
                 <div class="cf-turnstile" data-sitekey="1x00000000000000000000AA"></div>
             </div>
-            <button class="btn" id="btnSubmitAuth">> EXECUTE_AUTH</button>
-            <div style="margin-top: 20px; font-size: 14px; font-family: var(--font-code);">
-                <span id="authSwitchText" style="color: var(--text-muted);">New User?</span> 
-                <span style="color: var(--primary); cursor: pointer;" id="btnSwitchAuth">[Register]</span>
+            <button class="btn btn-primary" id="btnSubmitAuth">Đăng Nhập</button>
+            <div style="margin-top: 20px; font-size: 14px;">
+                <span id="authSwitchText" style="color: var(--text-muted);">Chưa có tài khoản?</span> 
+                <span style="color: var(--primary); cursor: pointer; font-weight: 500;" id="btnSwitchAuth">Đăng ký ngay</span>
             </div>
-            <p id="authError" style="color: var(--wrong); font-family: var(--font-code); margin-top: 15px; display: none;"></p>
+            <p id="authError" style="color: var(--wrong); margin-top: 15px; display: none; font-size: 14px;"></p>
         </div>
     </div>
 
     <div class="container" id="mainApp" style="display:none;">
         
         <div class="top-bar">
-            <div style="font-family: var(--font-code);"><span style="color: var(--primary);">~root@azota:</span> <b id="userEmailDisplay">Dev</b></div>
-            <button class="btn btn-outline" style="width: auto; padding: 8px 12px; font-size: 12px;" id="btnLogout">[x] Logout</button>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <i class="fa-solid fa-layer-group" style="color: var(--primary);"></i> 
+                <b id="userEmailDisplay">User</b>
+                <span class="tag">Beta V3.0</span>
+            </div>
+            <button class="btn" style="width: auto; padding: 6px 12px; font-size: 12px;" id="btnLogout">Đăng xuất</button>
         </div>
 
         <div id="screen-setup" class="app-screen card">
-            <h2 class="text-glow"><i class="fa-solid fa-code-branch"></i> AZOTA_CORE.INITIALIZE()</h2>
-            <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 14px;">> Động cơ kép: Regex x Gemini Flash. Chấp A,B,C,D chung 1 dòng.</p>
+            <h2>Tạo Đề Thi Mới</h2>
+            <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 14px;">Động cơ tách đáp án tự động. Nhận diện In đậm, Gạch chân, Màu sắc, hoặc có ghi chú (Đ)/(S).</p>
             
             <div class="upload-area" onclick="document.getElementById('fileUpload').click()">
-                <i class="fa-solid fa-file-code"></i>
-                <h3 id="fileNameDisplay" style="color: var(--text-main);">[ Upload File ]</h3>
-                <p style="color: var(--text-muted); font-family: var(--font-code); font-size: 12px;">Support: .docx, .pdf, .png</p>
+                <i class="fa-regular fa-file-word"></i>
+                <h3 id="fileNameDisplay" style="margin-bottom: 5px;">Tải file Word (.docx), PDF lên đây</h3>
+                <p style="color: var(--text-muted); margin:0; font-size: 13px;">Kéo thả hoặc click để chọn file</p>
                 <input type="file" id="fileUpload" accept=".docx, .pdf, image/*" style="display: none;" onchange="document.getElementById('fileNameDisplay').innerText = this.files[0].name">
             </div>
 
             <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 15px; margin-bottom: 20px;">
-                <div><label style="color: var(--text-muted); font-family: var(--font-code); font-size: 12px;">VAR EXAM_NAME =</label><input type="text" id="examName" placeholder='"Đề thi Khảo Sát"'></div>
-                <div><label style="color: var(--text-muted); font-family: var(--font-code); font-size: 12px;">VAR TIME_MINS =</label><input type="number" id="examTime" value="45"></div>
+                <div><label style="color: var(--text-muted); font-size: 13px; font-weight:500; margin-bottom:5px; display:block;">Tên bài thi</label><input type="text" id="examName" placeholder="VD: Đề thi Khảo Sát Lớp 11"></div>
+                <div><label style="color: var(--text-muted); font-size: 13px; font-weight:500; margin-bottom:5px; display:block;">Thời gian (Phút)</label><input type="number" id="examTime" value="45"></div>
             </div>
-            <button class="btn" style="padding: 16px; font-size: 16px;" onclick="processFile()">> RUN_ENGINE()</button>
+            <button class="btn btn-primary" style="padding: 14px; font-size: 15px;" onclick="processFile()"><i class="fa-solid fa-wand-magic-sparkles"></i> Phân Tích Đề Bằng Động Cơ Regex</button>
         </div>
 
         <div id="screen-preview" class="app-screen card">
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;">
-                <button class="btn btn-outline" style="width: auto;" onclick="switchScreen('screen-setup')">< Back</button>
-                <h2 style="margin:0;" class="text-glow">DATA_VERIFICATION</h2>
-                <button class="btn btn-secondary" style="width: auto; font-size: 12px;" onclick="refineWithAI()"><i class="fa-solid fa-robot"></i> Nhờ AI Fix Lỗi</button>
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
+                <button class="btn" style="width: auto; padding: 8px 15px;" onclick="switchScreen('screen-setup')"><i class="fa-solid fa-arrow-left"></i> Quay lại</button>
+                <h2 style="margin:0; font-size: 20px;">Kiểm tra cấu trúc đề</h2>
+                <button class="btn btn-ai" style="width: auto; padding: 8px 15px;" onclick="refineWithAI()">
+                    <i class="fa-solid fa-robot"></i> Dùng AI xử lý lại (Nếu lỗi)
+                </button>
             </div>
             
-            <div id="previewContainer" style="max-height: 550px; overflow-y: auto; padding-right: 10px; border: 1px solid var(--border); padding: 15px; border-radius: 8px; background: #0f172a;"></div>
+            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">Hệ thống đã tự động chọn đáp án đúng dựa vào định dạng file. Bạn có thể thay đổi thủ công nếu cần.</p>
             
-            <button class="btn" id="btnSaveToDatabase" style="margin-top:20px; padding: 16px;">
-                <i class="fa-solid fa-database"></i> SAVE_TO_DB & GENERATE_LINK
+            <div id="previewContainer" style="max-height: 550px; overflow-y: auto; padding-right: 5px;"></div>
+            
+            <button class="btn btn-primary" id="btnSaveToDatabase" style="margin-top:20px; padding: 14px;">
+                <i class="fa-solid fa-cloud-arrow-up"></i> Lưu Lên Hệ Thống & Lấy Link Thi
             </button>
             
-            <div id="shareLinkArea" style="display: none; margin-top: 20px; background: rgba(14, 165, 233, 0.1); padding: 20px; border-radius: 8px; border: 1px solid var(--primary);">
-                <label style="color: var(--primary); font-family: var(--font-code);">> DEPLOYMENT_SUCCESS. Link:</label>
+            <div id="shareLinkArea" style="display: none; margin-top: 20px; background: var(--bg-input); padding: 15px; border-radius: 6px; border: 1px solid var(--border);">
+                <label style="color: var(--primary); font-size: 14px; font-weight: 600;">Link chia sẻ (Gửi cho học sinh):</label>
                 <div style="display: flex; gap: 10px; margin-top: 10px;">
-                    <input type="text" id="shareLink" readonly style="margin: 0; font-family: var(--font-code); color: var(--correct);">
-                    <button class="btn btn-outline" style="width: auto;" onclick="copyLink()">[COPY]</button>
-                    <button class="btn" style="width: auto;" onclick="startTestMode()">[THI_NGAY]</button>
+                    <input type="text" id="shareLink" readonly style="margin: 0; color: var(--text-main);">
+                    <button class="btn" style="width: auto;" onclick="copyLink()">Copy</button>
+                    <button class="btn btn-primary" style="width: auto;" onclick="startTestMode()">Thi Ngay</button>
                 </div>
             </div>
         </div>
@@ -157,32 +182,35 @@
                 <div class="card" id="quizRender" style="flex: 1; margin-bottom: 0; max-height: 80vh; overflow-y: auto;"></div>
                 
                 <div class="card" id="timer-card" style="width: 250px; position: sticky; top: 20px; text-align: center;">
-                    <h3 style="color: var(--text-muted); font-family: var(--font-code); font-size: 14px; margin-bottom: 5px;">TIME_LEFT</h3>
-                    <h2 id="timerDisplay" style="color: var(--primary); font-family: var(--font-code); font-size: 40px; margin-bottom: 20px;">00:00</h2>
-                    <button class="btn" id="btnSubmitExam" onclick="submitTest()">SUBMIT_TEST()</button>
+                    <div style="color: var(--text-muted); font-size: 12px; font-weight: 600; text-transform: uppercase;">Thời gian còn lại</div>
+                    <div id="timerDisplay" style="color: var(--primary); font-family: var(--font-code); font-size: 32px; font-weight: 700; margin: 10px 0 20px 0;">00:00</div>
+                    <button class="btn btn-primary" id="btnSubmitExam" onclick="submitTest()">Nộp Bài</button>
                 </div>
             </div>
         </div>
 
         <div id="screen-result" class="app-screen">
-            <div class="card" style="text-align: center; border-color: var(--correct);">
-                <h2 class="text-glow">TEST_COMPLETED</h2>
-                <h1 id="finalScore" style="font-size: 90px; color: var(--correct); font-family: var(--font-code); margin: 10px 0;">10.0</h1>
-                <p id="scoreText" style="font-family: var(--font-code); color: var(--text-muted);">Matches: 0 / 0</p>
+            <div class="card" style="text-align: center;">
+                <h2 style="font-size: 24px;">Kết Quả Bài Làm</h2>
+                <h1 id="finalScore" style="font-size: 70px; font-weight: 700; margin: 5px 0;">10.0</h1>
+                <div id="scoreText" style="display: inline-block; background: var(--bg-input); border: 1px solid var(--border); padding: 8px 16px; border-radius: 20px; font-size: 14px; color: var(--text-muted); margin-bottom: 20px;">Đúng: 0 / 0 câu</div>
                 
-                <div style="display: flex; justify-content: center; gap: 10px; margin-top: 20px;">
-                    <button class="btn btn-outline" style="width: auto;" onclick="startTestMode()">[RETRY]</button>
-                    <button class="btn" style="width: auto;" onclick="window.location.href=window.location.pathname">[NEW_EXAM]</button>
+                <div style="display: flex; justify-content: center; gap: 10px;">
+                    <button class="btn" style="width: auto;" onclick="startTestMode()"><i class="fa-solid fa-rotate-right"></i> Thi Lại Đề Này</button>
+                    <button class="btn btn-primary" style="width: auto;" onclick="window.location.href=window.location.pathname">Đề Khác</button>
                 </div>
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                <div class="card" id="reviewRender" style="max-height: 500px; overflow-y: auto;"></div>
+                <div class="card" style="max-height: 600px; overflow-y: auto; padding: 20px;">
+                    <h3 style="border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 15px;">Chi Tiết Đáp Án</h3>
+                    <div id="reviewRender"></div>
+                </div>
                 
-                <div class="card">
-                    <h3 class="text-glow"><i class="fa-solid fa-trophy"></i> SERVER_LEADERBOARD</h3>
-                    <div id="leaderboardRender" style="margin-top: 15px;">
-                        <p style="color: var(--text-muted); font-family: var(--font-code); font-size: 12px;">> Fetching data...</p>
+                <div class="card" style="padding: 20px;">
+                    <h3 style="border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 15px;"><i class="fa-solid fa-ranking-star" style="color: #d2a8ff;"></i> Bảng Xếp Hạng</h3>
+                    <div id="leaderboardRender">
+                        <p style="color: var(--text-muted); font-size: 13px;">Đang tải dữ liệu...</p>
                     </div>
                 </div>
             </div>
@@ -193,7 +221,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, doc, getDoc, getDocs, query, where, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, doc, getDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAGk0pgSXDviwxbqnLMiUL43-qwZUX87eY",
@@ -208,9 +236,9 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        let isLoginMode = true; let currentUser = null; let currentUserName = "Guest";
+        let isLoginMode = true; let currentUser = null; let currentUserName = "Học Sinh";
         let rawData = { title: "", time: 45, items: [] };
-        let currentExamId = null; let tempRawHtml = ""; // Lưu html thô để gọi AI fix
+        let currentExamId = null; let tempRawHtml = ""; // HTML thô để AI fix
 
         window.switchScreen = function(screenId) {
             document.querySelectorAll('.app-screen').forEach(el => el.style.display = 'none');
@@ -218,13 +246,13 @@
             window.scrollTo(0,0);
         };
 
-        // --- AUTH & POPUP ---
+        // --- AUTH & THÔNG BÁO ---
         document.getElementById('btnSwitchAuth').onclick = () => {
             isLoginMode = !isLoginMode;
-            document.getElementById('authTitle').innerText = isLoginMode ? 'SYSTEM.LOGIN()' : 'SYSTEM.REGISTER()';
-            document.getElementById('btnSubmitAuth').innerText = isLoginMode ? '> EXECUTE_AUTH' : '> CREATE_USER';
-            document.getElementById('btnSwitchAuth').innerText = isLoginMode ? '[Register]' : '[Login]';
-            document.getElementById('authSwitchText').innerText = isLoginMode ? 'New User?' : 'Has Account?';
+            document.getElementById('authTitle').innerText = isLoginMode ? 'Đăng Nhập' : 'Tạo Tài Khoản';
+            document.getElementById('btnSubmitAuth').innerText = isLoginMode ? 'Đăng Nhập' : 'Đăng Ký';
+            document.getElementById('btnSwitchAuth').innerText = isLoginMode ? 'Đăng ký ngay' : 'Đăng nhập';
+            document.getElementById('authSwitchText').innerText = isLoginMode ? 'Chưa có tài khoản?' : 'Đã có tài khoản?';
             document.getElementById('authError').style.display = 'none';
         };
 
@@ -233,9 +261,9 @@
             const pass = document.getElementById('authPassword').value;
             try {
                 if (isLoginMode) { await signInWithEmailAndPassword(auth, email, pass); }
-                else { await createUserWithEmailAndPassword(auth, email, pass); Swal.fire("OK", "User registered.", "success"); }
+                else { await createUserWithEmailAndPassword(auth, email, pass); Swal.fire("Tuyệt", "Tạo tài khoản thành công", "success"); }
             } catch (e) {
-                document.getElementById('authError').innerText = "Err: " + e.message;
+                document.getElementById('authError').innerText = "Lỗi: " + e.message;
                 document.getElementById('authError').style.display = 'block';
             }
         };
@@ -250,9 +278,9 @@
                 
                 if (!sessionStorage.getItem('welcomed')) {
                     Swal.fire({
-                        title: "HỆ THỐNG ĐÃ KÍCH HOẠT",
-                        html: "<div style='font-family: monospace; text-align:left;'>ĐÂY LÀ BẢN THỬ NGHIỆM CỦA TH4NHPHVC.<br><br>Nếu có lỗi hoặc đề xuất ý tưởng, vui lòng liên hệ Admin qua Zalo:<br><b style='color:#0ea5e9;font-size:18px'>0328583859 (Thành Phúc)</b></div>",
-                        background: '#1e293b', color: '#f8fafc', confirmButtonColor: '#0ea5e9'
+                        title: "HỆ THỐNG AZOTA PRO",
+                        html: "<div style='text-align:left; font-size:14px; line-height:1.6;'>ĐÂY LÀ BẢN THỬ NGHIỆM CỦA TH4NHPHVC.<br><br>Nếu có lỗi hoặc đề xuất ý tưởng, vui lòng liên hệ Admin qua Zalo:<br><b style='color:#58a6ff;font-size:18px'>0328583859 (Thành Phúc)</b></div>",
+                        background: '#161b22', color: '#c9d1d9', confirmButtonColor: '#238636'
                     });
                     sessionStorage.setItem('welcomed', 'true');
                 }
@@ -260,12 +288,10 @@
                 const urlParams = new URLSearchParams(window.location.search);
                 currentExamId = urlParams.get('id');
                 if (currentExamId) { 
-                    // Hỏi tên trước khi thi nếu là link share
-                    const { value: name } = await Swal.fire({ title: 'Nhập Tên Hiển Thị', input: 'text', inputValue: currentUserName, allowOutsideClick: false, background: '#1e293b', color: '#fff' });
+                    const { value: name } = await Swal.fire({ title: 'Nhập Tên Hiển Thị Của Bạn', input: 'text', inputValue: currentUserName, allowOutsideClick: false, background: '#161b22', color: '#fff', confirmButtonColor: '#238636' });
                     if(name) currentUserName = name;
                     loadExamFromDatabase(currentExamId); 
-                } 
-                else { switchScreen('screen-setup'); }
+                } else { switchScreen('screen-setup'); }
             } else {
                 document.getElementById('authOverlay').style.display = 'flex';
                 document.getElementById('mainApp').style.display = 'none';
@@ -274,43 +300,64 @@
 
         document.getElementById('btnLogout').onclick = () => { signOut(auth); };
 
-        // --- ĐỘNG CƠ 1: QUÉT WORD (SIÊU REGEX) ---
+        // --- ĐỘNG CƠ THẾ HỆ 3: XỬ LÝ DÍNH CHÙM VÀ Đ/S ---
         function parseWordToExam(htmlString) {
             let items = [];
             
-            // XỬ LÝ ĐÁP ÁN CÙNG DÒNG: Chèn thẻ <br> trước các cụm A., B., C., D. nếu nó không nằm ở đầu dòng
-            htmlString = htmlString.replace(/(.)([ \t\xA0]+)(A\.|B\.|C\.|D\.)([ \t\xA0]+)/g, "$1<br>$3$4");
+            // LOGIC CHỐNG DÍNH DÒNG: Chèn <br> trước B., C., D. (hoặc A. nếu k ở đầu dòng)
+            let cleanHtml = htmlString.replace(/(&nbsp;|\s)+(A\.|B\.|C\.|D\.|a\)|b\)|c\)|d\))/g, "<br>$2");
 
             let tempDiv = document.createElement('div');
-            tempDiv.innerHTML = htmlString;
-            let paragraphs = tempDiv.querySelectorAll('p');
+            tempDiv.innerHTML = cleanHtml;
+            // Lấy tất cả các thẻ văn bản
+            let elements = tempDiv.querySelectorAll('p, h1, h2, h3, h4');
             let currentItem = null;
 
-            paragraphs.forEach(p => {
-                // Tách nội dung trong thẻ <p> dựa theo các thẻ <br> ta vừa ép vào
-                let subLines = p.innerHTML.split(/<br\s*\/?>/i);
+            elements.forEach(el => {
+                // Mammoth gộp dòng bằng <br>, ta chẻ nhỏ nó ra để soi
+                let lines = el.innerHTML.split(/<br\s*\/?>/i);
                 
-                subLines.forEach(lineHtml => {
+                lines.forEach(lineHtml => {
                     let subDiv = document.createElement('div');
                     subDiv.innerHTML = lineHtml;
                     let text = subDiv.textContent.trim();
                     if (!text) return;
 
-                    if (/^Câu\s*\d+[\:\.]/i.test(text)) {
+                    // 1. Nhận diện PHẦN / SECTION
+                    if (/^(PHẦN|I\.|II\.|III\.|IV\.|V\.)\s+/i.test(text)) {
+                        items.push({ type: 'section', text: text });
+                    }
+                    // 2. Nhận diện CÂU HỎI
+                    else if (/^Câu\s*\d+[\:\.]/i.test(text)) {
                         if (currentItem) items.push(currentItem);
                         currentItem = { type: 'mcq', text: text, options: [] };
                     }
-                    else if (/^[A-D][\.\:]/i.test(text) && currentItem) {
+                    // 3. Nhận diện ĐÁP ÁN
+                    else if (/^[A-D][\.\)]/i.test(text) && currentItem) {
                         let isCorrect = false;
+                        
+                        // Check Định dạng (Đậm, Gạch dưới, Màu)
                         if (subDiv.querySelector('b, strong, u') || subDiv.querySelector('span[style*="color"]')) { isCorrect = true; }
                         if (subDiv.getAttribute('style') && subDiv.getAttribute('style').includes('color')) { isCorrect = true; }
 
+                        // Check chữ Đ/S (Lọc text thô)
+                        let textUpper = text.toUpperCase();
+                        if (textUpper.includes('(Đ)') || textUpper.includes('[Đ]') || textUpper.endsWith(' Đ') || textUpper.endsWith(' ĐÚNG')) {
+                            isCorrect = true;
+                            text = text.replace(/(\(Đ\)|\[Đ\]| Đ| ĐÚNG)$/i, '').trim();
+                        } else if (textUpper.includes('(S)') || textUpper.includes('[S]') || textUpper.endsWith(' S') || textUpper.endsWith(' SAI')) {
+                            isCorrect = false; // Phủ quyết nếu ghi là Sai
+                            text = text.replace(/(\(S\)|\[S\]| S| SAI)$/i, '').trim();
+                        }
+
                         let label = text.match(/^([A-D])/i)[1].toUpperCase();
-                        let optText = text.replace(/^[A-D][\.\:]\s*/i, '').trim();
+                        let optText = text.replace(/^[A-D][\.\)]\s*/i, '').trim();
                         currentItem.options.push({ label: label, text: optText, isCorrect: isCorrect });
                     }
-                    else if (currentItem && currentItem.options.length === 0) {
-                        currentItem.text += '\n' + text;
+                    // 4. Nếu là dòng văn bản thường nối tiếp
+                    else if (currentItem) {
+                        if (currentItem.options.length === 0) { currentItem.text += '\n' + text; } // Nối vào câu hỏi
+                        else { currentItem.options[currentItem.options.length - 1].text += '\n' + text; } // Nối vào đáp án cuối
                     }
                 });
             });
@@ -321,31 +368,31 @@
         // --- GỌI ĐỘNG CƠ ---
         window.processFile = function() {
             let file = document.getElementById('fileUpload').files[0];
-            if (!file) return Swal.fire("Lỗi", "Chưa tải file!", "error");
+            if (!file) return Swal.fire("Lỗi", "Chưa tải file lên!", "error");
             
-            rawData.title = document.getElementById('examName').value || "Bài kiểm tra bí mật";
+            rawData.title = document.getElementById('examName').value || "Bài kiểm tra";
             rawData.time = parseInt(document.getElementById('examTime').value) || 45;
 
             document.getElementById('loadingOverlay').style.display = 'flex';
-            document.getElementById('loadingText').innerText = "> Executing Regex Engine...";
+            document.getElementById('loadingText').innerText = "Đang rà quét dữ liệu bằng Thuật toán Regex...";
             
             if (file.name.endsWith('.docx')) {
                 let reader = new FileReader();
                 reader.onload = function(e) {
                     mammoth.convertToHtml({arrayBuffer: e.target.result}, { styleMap: ["b => b", "strong => b", "u => u", "strike => s"] })
                     .then(result => {
-                        tempRawHtml = result.value; // Lưu lại để tí AI có thể dùng
+                        tempRawHtml = result.value; 
                         let extractedItems = parseWordToExam(result.value);
-                        if(extractedItems.length === 0) throw new Error("Format sai. Hãy đảm bảo có 'Câu 1:' và 'A.'");
+                        if(extractedItems.length === 0) throw new Error("File thiếu định dạng 'Câu 1:' hoặc 'A.'");
                         rawData.items = extractedItems;
                         document.getElementById('loadingOverlay').style.display = 'none';
                         showPreview();
                     })
-                    .catch(err => { Swal.fire("Error", err.message, "error"); document.getElementById('loadingOverlay').style.display = 'none'; });
+                    .catch(err => { Swal.fire("Lỗi Đọc File", err.message, "error"); document.getElementById('loadingOverlay').style.display = 'none'; });
                 };
                 reader.readAsArrayBuffer(file);
             } else {
-                document.getElementById('loadingText').innerText = "> Calling AI Gemini API...";
+                document.getElementById('loadingText').innerText = "Đang kích hoạt AI Gemini phân tích PDF/Ảnh...";
                 let reader = new FileReader();
                 reader.onload = function(e) {
                     goiAIBocTach({ type: "media", content: e.target.result.split(',')[1], mimeType: file.type });
@@ -354,34 +401,32 @@
             }
         };
 
+        // --- GỌI AI SỬA LỖI (NẾU REGEX NGU) ---
+        window.refineWithAI = function() {
+            if (!tempRawHtml) return Swal.fire("Thông báo", "Chỉ hỗ trợ file Word.", "info");
+            Swal.fire({
+                title: 'Dùng AI Phân Tích Lại?',
+                text: "AI sẽ đọc lại để hiểu ngữ cảnh những câu lộn xộn. Mất khoảng 15-30 giây.",
+                icon: 'question', showCancelButton: true, confirmButtonText: 'Bắt Đầu Quét', background: '#161b22', color: '#c9d1d9'
+            }).then((result) => {
+                if (result.isConfirmed) { goiAIBocTach({ type: "html", content: tempRawHtml }); }
+            });
+        };
+
         async function goiAIBocTach(payload) {
             try {
                 document.getElementById('loadingOverlay').style.display = 'flex';
-                document.getElementById('loadingText').innerText = "> Gemini Analyzing...";
+                document.getElementById('loadingText').innerText = "AI đang suy nghĩ và bóc tách...";
                 const res = await fetch('/api/tach-de', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
                 const data = await res.json();
                 if(data.error) throw new Error(data.error);
                 rawData.items = data;
                 showPreview();
-            } catch (e) { Swal.fire("AI Error", e.message, "error"); }
+            } catch (e) { Swal.fire("Lỗi Server AI", e.message, "error"); }
             finally { document.getElementById('loadingOverlay').style.display = 'none'; }
         }
 
-        // --- NÚT GỌI AI SỬA LỖI (REFINEMENT) ---
-        window.refineWithAI = function() {
-            if (!tempRawHtml) return Swal.fire("Thông báo", "Chỉ hỗ trợ sửa lỗi AI cho file Word.", "info");
-            Swal.fire({
-                title: 'Nhờ AI sửa lỗi?',
-                text: "AI sẽ đọc lại toàn bộ text để sửa các câu bị dính, lỗi cấu trúc. Sẽ mất khoảng 15 giây.",
-                icon: 'warning', showCancelButton: true, confirmButtonText: 'Chạy AI', background: '#1e293b', color: '#fff'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    goiAIBocTach({ type: "html", content: tempRawHtml });
-                }
-            });
-        };
-
-        // --- UI CHỈNH SỬA ---
+        // --- UI CHỈNH SỬA TÍCH HỢP ---
         window.updateRowColor = (idx, radio) => {
             document.querySelectorAll(`.opt-group-${idx} .ans-row`).forEach(r => { r.classList.remove('is-correct-row'); });
             radio.closest('.ans-row').classList.add('is-correct-row');
@@ -392,17 +437,17 @@
             let html = '';
             rawData.items.forEach((item, i) => {
                 if(item.type === 'section') {
-                    html += `<div style="margin:20px 0;"><input type="text" id="sec-${i}" value="${item.text.replace(/"/g, '&quot;')}" style="font-size:18px; color:var(--primary); font-weight:bold; background:transparent; border:none; border-bottom:1px solid var(--primary);"></div>`;
+                    html += `<div class="preview-section"><input type="text" id="sec-${i}" value="${item.text.replace(/"/g, '&quot;')}" style="font-size:16px; color:var(--primary); font-weight:600; background:transparent; border:none; padding:0;"></div>`;
                 } else {
-                    html += `<div style="margin-bottom:20px; padding:15px; border:1px solid var(--border); border-radius:8px; background:rgba(255,255,255,0.02);">
-                        <textarea id="eq-${i}" style="font-weight:bold; min-height:50px; background:transparent; border:none;">${item.text}</textarea>
+                    html += `<div style="margin-bottom:20px; padding:15px; border:1px solid var(--border); border-radius:8px; background:var(--bg-input);">
+                        <textarea id="eq-${i}" style="font-weight:600; min-height:50px; background:transparent; border:none; resize:vertical; width:100%; color:var(--text-main);">${item.text}</textarea>
                         <div class="opt-group-${i}">`;
                     item.options.forEach((opt, j) => {
                         let isSel = opt.isCorrect;
                         html += `<div class="ans-row ${isSel ? 'is-correct-row' : ''}">
-                            <input type="radio" name="r-${i}" ${isSel?'checked':''} id="r-${i}-${j}" onchange="updateRowColor(${i}, this)" style="width:18px; margin:0 10px 0 0;">
-                            <b style="color:var(--primary);">${opt.label}.</b> 
-                            <input type="text" id="t-${i}-${j}" value="${opt.text.replace(/"/g, '&quot;')}" style="margin:0; background:transparent; border:none; padding:5px;">
+                            <input type="radio" name="r-${i}" ${isSel?'checked':''} id="r-${i}-${j}" onchange="updateRowColor(${i}, this)" style="margin-top:2px;">
+                            <b style="color:var(--text-main);">${opt.label}.</b> 
+                            <input type="text" id="t-${i}-${j}" value="${opt.text.replace(/"/g, '&quot;')}" style="margin:0; background:transparent; border:none; padding:0; flex:1; font-weight:400; color:var(--text-muted);">
                         </div>`;
                     });
                     html += `</div></div>`;
@@ -413,7 +458,7 @@
 
         document.getElementById('btnSaveToDatabase').onclick = async () => {
             document.getElementById('loadingOverlay').style.display = 'flex';
-            document.getElementById('loadingText').innerText = "> Saving to Firebase...";
+            document.getElementById('loadingText').innerText = "Đang lưu lên hệ thống Cloud...";
             
             rawData.items.forEach((item, i) => {
                 if(item.type === 'section') item.text = document.getElementById(`sec-${i}`).value;
@@ -427,22 +472,18 @@
             });
             try {
                 const docRef = await addDoc(collection(db, "exams"), { ...rawData, author: currentUser.uid, date: new Date() });
-                currentExamId = docRef.id; // Lưu id để thi ngay
+                currentExamId = docRef.id;
                 document.getElementById('shareLink').value = window.location.origin + "?id=" + docRef.id;
                 document.getElementById('shareLinkArea').style.display = 'block';
-                Swal.fire({toast:true, position:'top-end', icon:'success', title:'Saved!', showConfirmButton:false, timer:1500});
+                Swal.fire({toast:true, position:'top-end', icon:'success', title:'Đã tạo link thi!', showConfirmButton:false, timer:2000});
             } catch (e) { Swal.fire("Lỗi DB", e.message, "error"); }
             finally { document.getElementById('loadingOverlay').style.display = 'none'; }
         };
 
         window.copyLink = () => { document.getElementById('shareLink').select(); document.execCommand('copy'); };
-        
-        window.startTestMode = function() {
-            if(!currentExamId) return;
-            window.location.href = window.location.origin + "?id=" + currentExamId;
-        };
+        window.startTestMode = function() { if(currentExamId) window.location.href = window.location.origin + "?id=" + currentExamId; };
 
-        // --- GIAO DIỆN THI ---
+        // --- GIAO DIỆN LÀM BÀI ---
         let timer, totalTimeSec, timeLeftSec, userAns = {};
         async function loadExamFromDatabase(id) {
             document.getElementById('loadingOverlay').style.display = 'flex';
@@ -455,19 +496,21 @@
         function startExamUI() { 
             userAns = {}; 
             switchScreen('screen-exam');
+            let mcqCount = rawData.items.filter(i=>i.type==='mcq').length;
             let html = `<h2 style="text-align:center; margin-bottom:5px;">${rawData.title}</h2>
-                        <div style="text-align:center; color:var(--primary); font-family:var(--font-code); font-size:12px; margin-bottom:20px;">> QTY: ${rawData.items.filter(i=>i.type==='mcq').length}</div>`;
+                        <div style="text-align:center; color:var(--text-muted); font-size:13px; margin-bottom:20px;">Tổng: ${mcqCount} Câu hỏi</div>
+                        <hr style="border:1px dashed var(--border); margin-bottom:20px;"/>`;
             
             rawData.items.forEach((item, i) => {
-                if(item.type === 'section') html += `<h3 style="margin-top:30px; color:var(--secondary); border-bottom:1px solid var(--border); padding-bottom:5px;">// ${item.text}</h3>`;
+                if(item.type === 'section') html += `<h3 style="margin-top:25px; color:var(--primary); font-size:16px;">${item.text}</h3>`;
                 else {
-                    html += `<div style="margin-bottom:25px; background:rgba(0,0,0,0.2); padding:20px; border-radius:8px; border:1px solid var(--border);">
-                        <b style="font-size:16px;">${item.text}</b>
-                        <div style="margin-top:15px; display:flex; flex-direction:column; gap:8px;">`;
+                    html += `<div style="margin-bottom:20px; padding:20px 0; border-bottom:1px solid var(--border);">
+                        <b style="font-size:15px; display:block; margin-bottom:15px; line-height:1.6;">${item.text}</b>
+                        <div style="display:flex; flex-direction:column; gap:8px;">`;
                     item.options.forEach((opt, j) => {
                         html += `<label class="opt-label" onclick="document.querySelectorAll('input[name=q-${i}]').forEach(r=>r.closest('label').classList.remove('selected')); this.classList.add('selected');">
-                        <input type="radio" name="q-${i}" onchange="userAns[${i}]=${j}" style="margin-top:3px; margin-right:10px;"> 
-                        <span><b style="color:var(--primary);">${opt.label}.</b> ${opt.text}</span></label>`;
+                        <input type="radio" name="q-${i}" onchange="userAns[${i}]=${j}" style="margin-top:3px; margin-right:10px; accent-color:var(--primary);"> 
+                        <span style="flex:1; line-height:1.4;"><b style="color:var(--text-muted);">${opt.label}.</b> ${opt.text}</span></label>`;
                     });
                     html += `</div></div>`;
                 }
@@ -487,11 +530,11 @@
 
         window.submitTest = async function() {
             clearInterval(timer);
-            Swal.fire({ title: 'Processing...', allowOutsideClick: false, background: '#1e293b', color: '#fff', didOpen: () => { Swal.showLoading(); } });
+            Swal.fire({ title: 'Đang Nộp Bài...', background: '#161b22', color: '#c9d1d9', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
             
             let timeTaken = totalTimeSec - (timeLeftSec > 0 ? timeLeftSec : 0);
             let score = 0, totalMcq = 0;
-            let reviewHtml = '<h3 style="margin-bottom:20px;">> REVIEW_LOGS</h3>';
+            let reviewHtml = '';
 
             rawData.items.forEach((item, i) => {
                 if(item.type === 'mcq') {
@@ -502,38 +545,45 @@
                     if(isTrue) score++;
 
                     let statusCol = isTrue ? 'var(--correct)' : 'var(--wrong)';
-                    reviewHtml += `<div style="padding:15px; border:1px solid ${statusCol}; border-left:4px solid ${statusCol}; margin-bottom:15px; background:var(--bg-input); border-radius:8px;">
-                        <b style="font-size:15px;">${item.text}</b><div style="margin-top:10px;">`;
+                    let iconBg = isTrue ? 'var(--correct-bg)' : 'var(--wrong-bg)';
+                    let iconClass = isTrue ? 'fa-check' : 'fa-xmark';
+                    
+                    reviewHtml += `<div style="padding:15px; border:1px solid var(--border); border-left:4px solid ${statusCol}; margin-bottom:15px; background:var(--bg-input); border-radius:6px;">
+                        <div style="display:flex; gap:10px; margin-bottom:12px;">
+                            <div style="background:${iconBg}; color:${statusCol}; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;"><i class="fa-solid ${iconClass} style="font-size:12px;"></i></div>
+                            <b style="font-size:14px; line-height:1.5;">${item.text}</b>
+                        </div>
+                        <div style="padding-left:34px;">`;
                     
                     item.options.forEach((opt, j) => {
-                        let c = ''; 
-                        if (j === correctIdx) c = `color:var(--correct); font-weight:bold;`;
-                        else if (j === uAns && j !== correctIdx) c = `color:var(--wrong); text-decoration:line-through;`;
-                        else c = `color:var(--text-muted);`;
+                        let styling = `color:var(--text-muted);`; 
+                        if (j === correctIdx) styling = `color:var(--correct); font-weight:600; background:var(--correct-bg); border-radius:4px; padding:4px 8px;`;
+                        else if (j === uAns && j !== correctIdx) styling = `color:var(--wrong); text-decoration:line-through; padding:4px 0;`;
+                        else styling = `padding:4px 0; color:var(--text-muted);`;
                         
-                        reviewHtml += `<div style="padding:5px 0; ${c}"><b>${opt.label}.</b> ${opt.text}</div>`;
+                        reviewHtml += `<div style="${styling} margin-bottom:4px; font-size:14px;"><b>${opt.label}.</b> ${opt.text}</div>`;
                     });
                     reviewHtml += `</div></div>`;
                 }
             });
 
             let finalS = totalMcq > 0 ? ((score/totalMcq)*10).toFixed(2) : "0";
-            document.getElementById('scoreText').innerText = `Matches: ${score} / ${totalMcq} | Time: ${Math.floor(timeTaken/60)}m ${timeTaken%60}s`;
-            document.getElementById('finalScore').innerText = finalS;
+            document.getElementById('scoreText').innerText = `Đúng: ${score} / ${totalMcq} | T.Gian: ${Math.floor(timeTaken/60)}p ${timeTaken%60}s`;
+            let fScoreEl = document.getElementById('finalScore');
+            fScoreEl.innerText = finalS;
+            fScoreEl.style.color = (finalS >= 8) ? 'var(--primary)' : (finalS >= 5 ? '#d2a8ff' : 'var(--wrong)');
+            
             document.getElementById('reviewRender').innerHTML = reviewHtml;
 
-            // LƯU ĐIỂM LÊN BẢNG XẾP HẠNG
             try {
                 await addDoc(collection(db, "exam_results"), { examId: currentExamId, name: currentUserName, score: parseFloat(finalS), timeTaken: timeTaken, date: new Date() });
                 loadLeaderboard();
-            } catch(e) { console.log("LB err:", e); }
+            } catch(e) { console.log(e); }
 
             Swal.close();
             switchScreen('screen-result');
-            if (finalS >= 5) confetti({ particleCount: 200, spread: 80, origin: { y: 0.5 } });
         };
 
-        // --- FETCH BẢNG XẾP HẠNG (Client-side sort để tránh lỗi Index Firebase) ---
         async function loadLeaderboard() {
             const lbRender = document.getElementById('leaderboardRender');
             try {
@@ -542,22 +592,22 @@
                 let results = [];
                 querySnapshot.forEach((doc) => results.push(doc.data()));
                 
-                // Sort điểm cao nhất -> thời gian ngắn nhất
                 results.sort((a, b) => b.score - a.score || a.timeTaken - b.timeTaken);
                 
-                if(results.length === 0) { lbRender.innerHTML = "<p>No data yet.</p>"; return; }
+                if(results.length === 0) { lbRender.innerHTML = "<p style='color:var(--text-muted); font-size:13px;'>Chưa có ai thi đề này.</p>"; return; }
                 
                 let lbHtml = '';
                 results.slice(0, 10).forEach((r, idx) => {
                     let m = Math.floor(r.timeTaken/60); let s = r.timeTaken%60;
-                    lbHtml += `<div class="lb-row">
-                        <div>#${idx+1} ${r.name}</div>
-                        <div>${r.score}đ</div>
-                        <div>${m}m ${s}s</div>
+                    let topClass = (idx === 0) ? 'top-1' : '';
+                    lbHtml += `<div class="lb-row ${topClass}">
+                        <div style="flex:2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">#${idx+1} ${r.name}</div>
+                        <div style="flex:1; text-align:center;">${r.score}đ</div>
+                        <div style="flex:1; text-align:right;">${m}p${s}s</div>
                     </div>`;
                 });
                 lbRender.innerHTML = lbHtml;
-            } catch(e) { lbRender.innerHTML = "Err loading DB."; }
+            } catch(e) { lbRender.innerHTML = "Lỗi tải bảng xếp hạng."; }
         }
     </script>
 </body>
