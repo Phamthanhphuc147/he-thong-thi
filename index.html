@@ -112,7 +112,7 @@
 
         <div id="screen-setup" class="app-screen card">
             <h2 style="text-align: center; font-size: 32px;">Trình Tạo Đề Thông Minh</h2>
-            <p style="text-align: center; color: var(--text-muted); margin-bottom: 30px; font-weight: 600;">Động cơ siêu nhận diện: Xử lý đáp án liền dòng, câu Đúng/Sai, nhận diện dấu * và bôi đậm.</p>
+            <p style="text-align: center; color: var(--text-muted); margin-bottom: 30px; font-weight: 600;">Động cơ siêu nhận diện: Xử lý đáp án liền dòng, câu Đúng/Sai, tự sửa lỗi.</p>
             
             <div class="upload-area" onclick="document.getElementById('fileUpload').click()">
                 <i class="fa-solid fa-file-word"></i>
@@ -213,7 +213,7 @@
 
         let isLoginMode = true; let currentUser = null; let currentUserName = "Khách";
         let rawData = { title: "", time: 45, items: [] };
-        let currentExamId = null; let tempRawHtml = ""; // Dữ liệu thô cho AI
+        let currentExamId = null; let tempRawHtml = ""; 
 
         window.switchScreen = function(screenId) {
             document.querySelectorAll('.app-screen').forEach(el => el.style.display = 'none');
@@ -221,7 +221,7 @@
             window.scrollTo(0,0);
         };
 
-        // --- BỘ LỌC REGEX THẾ HỆ 3 (CHUẨN AZOTA) ---
+        // --- BỘ LỌC REGEX THẾ HỆ 3.1: BẤT TỬ VỚI MỌI ĐỊNH DẠNG ---
         function parseWordToExam(htmlString) {
             let items = [];
             
@@ -231,41 +231,49 @@
                 .replace(/<b>(.*?)<\/b>/gi, ' [!b:$1$] ')
                 .replace(/<u>(.*?)<\/u>/gi, ' [!u:$1$] ')
                 .replace(/<\/p>/gi, '\n')
-                .replace(/<br\s*\/?>/gi, '\n');
+                .replace(/<br\s*\/?>/gi, '\n')
+                .replace(/<\/div>/gi, '\n');
 
             let tempDiv = document.createElement('div');
             tempDiv.innerHTML = processedHtml;
             let rawText = tempDiv.textContent || tempDiv.innerText;
             
-            // 2. Cắt thành từng dòng
-            let lines = rawText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            // XÓA KÝ TỰ TÀNG HÌNH (Gây lỗi Regex)
+            rawText = rawText.replace(/[\u200B-\u200D\uFEFF]/g, '');
+
+            // CHỐNG DÍNH DÒNG: Chèn <br> tự động trước A. B. C. D.
+            let cleanText = rawText.replace(/(\s+)(\*?\s*[A-D][\.\:\)])/g, "\n$2");
+
+            let lines = cleanText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
             let currentItem = null;
 
             for (let line of lines) {
-                // Kiểm tra tên đoạn (Phần I, Phần II...)
-                let cleanLineToTest = line.replace(/\[![a-z]+:\$(.*?)\$\]/g, '$1').trim();
-                
-                if (/^(PHẦN\s+[A-Z0-9IVX]+)/i.test(cleanLineToTest)) {
-                    items.push({ type: 'section', text: cleanLineToTest });
+                // Lọc sạch text thô để Test điều kiện
+                let rawLineToTest = line.replace(/\[![a-z]+:\$(.*?)\$\]/g, '$1').trim();
+
+                // 1. Nhận diện PHẦN / SECTION
+                if (/^(PHẦN|I\.|II\.|III\.|IV\.|V\.)\s+/i.test(rawLineToTest)) {
+                    items.push({ type: 'section', text: rawLineToTest });
                     currentItem = null;
                     continue;
                 }
 
-                // Kiểm tra Câu hỏi (Câu 1:, Câu 2.)
-                if (/^Câu\s*\d+[\:\.]/i.test(cleanLineToTest)) {
+                // 2. Nhận diện CÂU HỎI (BẤT CHẤP LỖI CÚ PHÁP CỦA GIÁO VIÊN)
+                // Nó sẽ nhận: Câu 1, Câu 1:, Bài 1, Question 1...
+                if (/^(Câu|Bài|Question)\s*\d+/i.test(rawLineToTest)) {
                     if (currentItem) items.push(currentItem);
-                    currentItem = { type: 'mcq', text: cleanLineToTest, options: [] };
+                    currentItem = { type: 'mcq', text: line, options: [] };
                     continue;
                 }
 
-                // Xử lý dòng chứa đáp án (Bao gồm cả đáp án dính chùm trên 1 dòng)
-                // Biểu thức chia nhỏ các đoạn bắt đầu bằng A., B., a), *C., [!b:$Đ$]...
-                let tokens = line.split(/(\*?\s*[A-D][\.\:]|\*?\s*[a-d]\))/);
+                // 3. Xử lý dòng chứa đáp án
+                // Cắt dòng thành các đoạn A. B. C. D.
+                let tokens = line.split(/(\*?\s*[A-D]\s*[\.\:\)]|\*?\s*[a-d]\))/);
 
                 if (tokens.length > 1 && currentItem) {
-                    // Cụm đầu tiên không phải đáp án thì nối vào Câu hỏi
+                    // Cụm đầu tiên k phải đáp án -> nối vào câu hỏi
                     if (tokens[0].trim()) {
-                        let txt = tokens[0].trim().replace(/\[![a-z]+:\$(.*?)\$\]/g, '$1');
+                        let txt = tokens[0].trim();
                         if (currentItem.options.length === 0) currentItem.text += '\n' + txt;
                         else currentItem.options[currentItem.options.length - 1].text += '\n' + txt;
                     }
@@ -275,31 +283,32 @@
                         let marker = tokens[j].trim();
                         let content = (tokens[j+1] || "").trim();
                         
-                        let isStarred = marker.startsWith('*'); // Azota dùng dấu *
-                        let cleanLabel = marker.replace(/[\*\.\:\)]/g, '').toUpperCase(); // A, B, a, b -> A, B
+                        let isStarred = marker.startsWith('*'); 
+                        let cleanLabel = marker.replace(/[\*\.\:\)]/g, '').trim().toUpperCase();
                         let isCorrect = isStarred;
 
-                        // Logic nhận diện (Đ) / (S) của Azota
-                        if (/\[!b:\$Đ\$\]/i.test(content) || /\(Đ\)/i.test(content) || /\[Đ\]/i.test(content)) {
+                        // Logic nhận diện (Đ) / (S) và In đậm đáp án
+                        let rawContentTest = content.replace(/\[![a-z]+:\$(.*?)\$\]/g, '$1').toUpperCase();
+                        
+                        if (rawContentTest.includes('(Đ)') || rawContentTest.includes('[Đ]') || rawContentTest.endsWith(' Đ') || /\[!b:\$Đ\$\]/i.test(content)) {
                             isCorrect = true;
-                            content = content.replace(/\[!b:\$Đ\$\]|\(Đ\)|\[Đ\]/gi, '').trim();
-                        } else if (/\[!b:\$S\$\]/i.test(content) || /\(S\)/i.test(content) || /\[S\]/i.test(content)) {
-                            isCorrect = false; // Phủ định
-                            content = content.replace(/\[!b:\$S\$\]|\(S\)|\[S\]/gi, '').trim();
+                            content = content.replace(/\[!b:\$Đ\$\]|\(Đ\)|\[Đ\]| Đ$/gi, '').trim();
+                        } else if (rawContentTest.includes('(S)') || rawContentTest.includes('[S]') || rawContentTest.endsWith(' S') || /\[!b:\$S\$\]/i.test(content)) {
+                            isCorrect = false; 
+                            content = content.replace(/\[!b:\$S\$\]|\(S\)|\[S\]| S$/gi, '').trim();
                         } else if (/\[![bu]:\$(.*?)\$\]/.test(content)) {
-                            isCorrect = true; // In đậm / Gạch chân nguyên chữ
+                            isCorrect = true; 
                         }
 
-                        // Xóa các thẻ rác định dạng để hiển thị đẹp
                         content = content.replace(/\[![a-z]+:\$(.*?)\$\]/g, '$1').trim();
-                        
                         currentItem.options.push({ label: cleanLabel, text: content, isCorrect: isCorrect });
                     }
                 } 
                 // Không chứa cụm đáp án -> Nối tiếp văn bản
                 else if (currentItem) {
-                    if (currentItem.options.length === 0) { currentItem.text += '\n' + cleanLineToTest; }
-                    else { currentItem.options[currentItem.options.length - 1].text += '\n' + cleanLineToTest; }
+                    let cleanCont = line.replace(/\[![a-z]+:\$(.*?)\$\]/g, '$1');
+                    if (currentItem.options.length === 0) { currentItem.text += '\n' + cleanCont; }
+                    else { currentItem.options[currentItem.options.length - 1].text += '\n' + cleanCont; }
                 }
             }
             if (currentItem) items.push(currentItem);
@@ -362,7 +371,7 @@
 
         document.getElementById('btnLogout').onclick = () => { signOut(auth); };
 
-        // --- XỬ LÝ FILE ---
+        // --- XỬ LÝ FILE (TỰ ĐỘNG CHUYỂN AI NẾU REGEX BÓ TAY) ---
         window.processFile = function() {
             let file = document.getElementById('fileUpload').files[0];
             if (!file) return Swal.fire("Lỗi", "Bạn chưa chọn file để bóc tách!", "warning");
@@ -373,19 +382,27 @@
             document.getElementById('loadingOverlay').style.display = 'flex';
             
             if (file.name.endsWith('.docx')) {
-                document.getElementById('loadingText').innerHTML = "Đang dùng Thuật Toán nội bộ cắt câu...<br><small>(Chuẩn format Azota)</small>";
+                document.getElementById('loadingText').innerHTML = "Đang dùng Thuật Toán nội bộ cắt câu...<br><small>(Tốc độ 0.1s)</small>";
                 let reader = new FileReader();
                 reader.onload = function(e) {
                     mammoth.convertToHtml({arrayBuffer: e.target.result}, { styleMap: ["b => b", "strong => b", "u => u"] })
                     .then(result => {
                         tempRawHtml = result.value; 
                         let extractedItems = parseWordToExam(result.value);
-                        if(extractedItems.length === 0) throw new Error("Không tìm thấy dữ liệu. Hãy đảm bảo đề bắt đầu bằng 'Câu 1:'");
+                        
+                        // TÍNH NĂNG TỰ ĐỘNG QUAY XE (FALLBACK):
+                        // Nếu Regex đọc file mà ko ra câu nào, tự gọi AI luôn, ko báo lỗi nữa!
+                        if(extractedItems.length === 0) {
+                            document.getElementById('loadingText').innerHTML = "Cấu trúc đề hơi dị. Đang tự động chuyển sang chế độ AI nhận diện sâu...<br><small>(Chờ khoảng 15s)</small>";
+                            goiAIBocTach({ type: "html", content: tempRawHtml });
+                            return; // Dừng luồng regex ở đây
+                        }
+
                         rawData.items = extractedItems;
                         document.getElementById('loadingOverlay').style.display = 'none';
                         showPreview();
                     })
-                    .catch(err => { Swal.fire("Lỗi Phân Tích", err.message, "error"); document.getElementById('loadingOverlay').style.display = 'none'; });
+                    .catch(err => { Swal.fire("Lỗi Đọc File", err.message, "error"); document.getElementById('loadingOverlay').style.display = 'none'; });
                 };
                 reader.readAsArrayBuffer(file);
             } else {
@@ -396,12 +413,12 @@
             }
         };
 
-        // --- NÚT GỌI AI CHỮA CHÁY ---
+        // --- NÚT GỌI AI CHỮA CHÁY (MANUAL) ---
         window.refineWithAI = function() {
             if (!tempRawHtml) return Swal.fire("Info", "Hỗ trợ dùng AI fix lỗi với file Word.", "info");
             Swal.fire({
                 title: 'Kích hoạt AI Sửa Lỗi?',
-                text: "Nếu thuật toán nhận diện sai do đề quá dị, AI Gemini sẽ đọc và bóc tách lại một cách thông minh (Mất khoảng 15s).",
+                text: "AI Gemini sẽ đọc và bóc tách lại một cách thông minh (Mất khoảng 15s).",
                 icon: 'question', showCancelButton: true, confirmButtonText: 'Dùng AI', confirmButtonColor: '#8b5cf6'
             }).then((result) => {
                 if (result.isConfirmed) { goiAIBocTach({ type: "html", content: tempRawHtml }); }
@@ -411,7 +428,6 @@
         async function goiAIBocTach(payload) {
             try {
                 document.getElementById('loadingOverlay').style.display = 'flex';
-                document.getElementById('loadingText').innerText = "Vệ tinh AI đang quét dữ liệu...";
                 const res = await fetch('/api/tach-de', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
                 const data = await res.json();
                 if(data.error) throw new Error(data.error);
@@ -434,8 +450,10 @@
                 if(item.type === 'section') {
                     html += `<div class="preview-section"><input type="text" id="sec-${i}" value="${item.text.replace(/"/g, '&quot;')}" style="font-size:20px; font-weight:800; background:transparent; border:none; padding:0; color:inherit;"></div>`;
                 } else {
+                    // Dọn dẹp lại text cho đẹp khi preview
+                    let cleanQuestion = item.text.replace(/\[![a-z]+:\$(.*?)\$\]/g, '$1');
                     html += `<div class="card" style="padding:20px;">
-                        <textarea id="eq-${i}" style="font-weight:700; font-size:16px; min-height:50px; border-color:#e2e8f0; resize:vertical;">${item.text}</textarea>
+                        <textarea id="eq-${i}" style="font-weight:700; font-size:16px; min-height:50px; border-color:#e2e8f0; resize:vertical;">${cleanQuestion}</textarea>
                         <div class="opt-group-${i}">`;
                     item.options.forEach((opt, j) => {
                         let isSel = opt.isCorrect;
@@ -475,7 +493,7 @@
             finally { document.getElementById('loadingOverlay').style.display = 'none'; }
         };
 
-        window.copyLink = () => { document.getElementById('shareLink').select(); document.execCommand('copy'); };
+        window.copyLink = () => { document.getElementById('shareLink').select(); document.execCommand('copy'); Swal.fire({toast:true, position:'top-end', icon:'success', title:'Đã Copy', showConfirmButton:false, timer:1500}); };
         window.startTestMode = function() { if(currentExamId) window.location.href = window.location.origin + "?id=" + currentExamId; };
 
         // --- GIAO DIỆN LÀM BÀI ---
