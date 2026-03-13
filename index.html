@@ -12,6 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700;800&family=Fira+Code:wght@700;900&display=swap" rel="stylesheet">
     
     <style>
+        /* GIAO DIỆN SÁNG - ĐẸP, SẠCH, CHUẨN EDTECH */
         :root { 
             --primary: #2563eb; --primary-hover: #1d4ed8; 
             --secondary: #0ea5e9; 
@@ -28,7 +29,7 @@
         .container { max-width: 1050px; margin: auto; position: relative; }
         
         /* MÀN HÌNH CHÀO RGB TH4NHPHVCD3V */
-        #rgbWelcome { position: fixed; inset: 0; background: #0f172a; z-index: 99999; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: opacity 0.5s ease; }
+        #rgbWelcome { position: fixed; inset: 0; background: #0f172a; z-index: 99999; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: opacity 0.4s ease; }
         .rgb-text { font-size: 5vw; font-weight: 900; font-family: 'Fira Code', monospace; text-align: center; padding: 20px;
             background: linear-gradient(270deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
             background-size: 400% 400%; -webkit-background-clip: text; color: transparent; animation: rgbGlow 3s ease infinite; letter-spacing: 2px;}
@@ -220,11 +221,20 @@
         let rawData = { title: "", time: 45, items: [] };
         let currentExamId = null; let tempRawHtml = ""; 
 
-        // Xử lý Intro RGB
-        setTimeout(() => { 
-            document.getElementById('rgbWelcome').style.opacity = '0'; 
-            setTimeout(()=> document.getElementById('rgbWelcome').style.display='none', 500); 
-        }, 3000);
+        // XỬ LÝ MÀN HÌNH CHÀO RGB TH4NHPHVCD3V (TỐI ƯU UX)
+        if (!sessionStorage.getItem('rgbIntroShown')) {
+            // Lần đầu tải: Hiện 1.5 giây
+            setTimeout(() => { 
+                document.getElementById('rgbWelcome').style.opacity = '0'; 
+                setTimeout(() => {
+                    document.getElementById('rgbWelcome').style.display = 'none';
+                    sessionStorage.setItem('rgbIntroShown', 'true');
+                }, 400); // 0.4s để mờ dần
+            }, 1500); // Đợi 1.5s
+        } else {
+            // Đã xem rồi: Tắt lập tức, không bắt đợi
+            document.getElementById('rgbWelcome').style.display = 'none';
+        }
 
         window.switchScreen = function(screenId) {
             document.querySelectorAll('.app-screen').forEach(el => el.style.display = 'none');
@@ -407,7 +417,7 @@
                     let badge = item.type === 'mcq' ? 'Trắc nghiệm' : 'Đúng/Sai';
                     html += `<div class="card" style="padding:20px;">
                         <div style="margin-bottom:10px;"><span style="background:#e0e7ff; color:var(--primary); font-weight:700; padding:4px 10px; border-radius:12px; font-size:12px;">${badge}</span></div>
-                        <textarea id="eq-${i}" style="font-weight:700; font-size:16px; min-height:50px;">${item.text}</textarea>
+                        <textarea id="eq-${i}" style="font-weight:700; font-size:16px; min-height:50px; border-color:#e2e8f0;">${item.text}</textarea>
                         <div style="margin-top:15px;">`;
                     
                     item.options.forEach((opt, j) => {
@@ -463,14 +473,13 @@
             if (docSnap.exists()) { rawData = docSnap.data(); startExamUI(); }
         }
 
-        window.setStudentTF = function(qIdx, optIdx, state) {
+        window.setStudentTF = function(qIdx, optIdx, state, event) {
             if(!userAns[qIdx]) userAns[qIdx] = {};
             userAns[qIdx][optIdx] = state;
-            // Update UI radio manually for aesthetics
-            document.querySelectorAll(`input[name="q-${qIdx}-opt-${optIdx}"]`).forEach(r => {
-                r.closest('.tf-radio-label').style.color = 'inherit';
-            });
-            event.target.closest('.tf-radio-label').style.color = var(--primary);
+            // Update UI radio manually
+            let row = event.target.closest('.tf-student-options');
+            row.querySelectorAll('.tf-radio-label').forEach(r => r.style.color = 'inherit');
+            event.target.closest('.tf-radio-label').style.color = 'var(--primary)';
         };
 
         function startExamUI() { 
@@ -493,8 +502,8 @@
                             html += `<div class="tf-student-row">
                                 <span style="flex:1; line-height:1.5;"><b>${opt.label.toLowerCase()})</b> ${opt.text}</span>
                                 <div class="tf-student-options">
-                                    <label class="tf-radio-label"><input type="radio" name="q-${i}-opt-${j}" onchange="setStudentTF(${i},${j},'Đ')" style="accent-color:var(--correct); transform:scale(1.2);"> Đúng</label>
-                                    <label class="tf-radio-label"><input type="radio" name="q-${i}-opt-${j}" onchange="setStudentTF(${i},${j},'S')" style="accent-color:var(--wrong); transform:scale(1.2);"> Sai</label>
+                                    <label class="tf-radio-label"><input type="radio" name="q-${i}-opt-${j}" onchange="setStudentTF(${i},${j},'Đ', event)" style="accent-color:var(--correct); transform:scale(1.2);"> Đúng</label>
+                                    <label class="tf-radio-label"><input type="radio" name="q-${i}-opt-${j}" onchange="setStudentTF(${i},${j},'S', event)" style="accent-color:var(--wrong); transform:scale(1.2);"> Sai</label>
                                 </div>
                             </div>`;
                         }
@@ -517,7 +526,7 @@
             clearInterval(timer);
             Swal.fire({ title: 'Đang chấm bài...', didOpen: () => { Swal.showLoading(); } });
             
-            let totalActions = 0; // Đếm số lượng cần chọn (1 MCQ = 1, 1 T/F row = 1)
+            let totalActions = 0; 
             let scoreActions = 0;
             let reviewHtml = '';
 
@@ -529,7 +538,6 @@
                     if(isTrue) scoreActions++;
 
                     let sColor = isTrue ? 'var(--correct)' : 'var(--wrong)';
-                    let bg = isTrue ? 'var(--correct-bg)' : 'var(--wrong-bg)';
                     
                     reviewHtml += `<div style="padding:15px; border:2px solid ${sColor}; margin-bottom:15px; border-radius:12px; background:white;">
                         <b style="font-size:16px;">${item.text}</b><div style="margin-top:10px; padding-left:10px;">`;
@@ -551,7 +559,7 @@
                     item.options.forEach((opt, j) => {
                         totalActions++; tfActions++;
                         let uA = userAns[i] ? userAns[i][j] : null;
-                        let cA = opt.tfState; // 'Đ' or 'S'
+                        let cA = opt.tfState; 
                         let isTrueRow = (uA === cA);
                         if(isTrueRow) { scoreActions++; itemQScore++; }
 
@@ -562,17 +570,17 @@
                         htmlTF += `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #e2e8f0; background:${rBg}; border-left:4px solid ${rColor}; margin-bottom:5px;">
                             <span style="flex:1;"><b>${opt.label.toLowerCase()})</b> ${opt.text}</span>
                             <div style="font-weight:800; color:${rColor}; min-width:120px; text-align:right;">
-                                Lựa chọn: ${uA||'Trống'} ${icon}<br><small style="color:var(--text-muted);">Đáp án: ${cA}</small>
+                                Lựa chọn: ${uA||'Trống'} ${icon}<br><small style="color:var(--text-muted);">Đáp án gốc: ${cA}</small>
                             </div>
                         </div>`;
                     });
-                    htmlTF += `</div><div style="text-align:right; font-weight:700; color:var(--primary); margin-top:10px;">Đạt: ${itemQScore}/${tfActions} ý</div></div>`;
+                    htmlTF += `</div><div style="text-align:right; font-weight:700; color:var(--primary); margin-top:10px;">Điểm câu này: ${itemQScore}/${tfActions} ý</div></div>`;
                     reviewHtml += htmlTF;
                 }
             });
 
             let finalS = totalActions > 0 ? ((scoreActions/totalActions)*10).toFixed(2) : "0";
-            document.getElementById('scoreText').innerText = `Tỉ lệ đúng: ${scoreActions} / ${totalActions} thao tác`;
+            document.getElementById('scoreText').innerText = `Thành tích: ${scoreActions} / ${totalActions} thao tác`;
             document.getElementById('finalScore').innerText = finalS;
             document.getElementById('reviewRender').innerHTML = reviewHtml;
 
