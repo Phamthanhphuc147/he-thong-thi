@@ -97,7 +97,7 @@
 
     <div id="loadingOverlay" style="position: fixed; inset:0; background:rgba(255,255,255,0.95); z-index: 30000; display: none; flex-direction: column; align-items: center; justify-content: center;">
         <i class="fa-solid fa-spinner fa-spin" style="font-size: 60px; color: var(--primary); margin-bottom: 20px;"></i>
-        <h2 style="color: var(--primary); text-align: center; font-weight: 800;" id="loadingText">Đang dọn dẹp dữ liệu...</h2>
+        <h2 style="color: var(--primary); text-align: center; font-weight: 800;" id="loadingText">Đang xử lý dữ liệu...</h2>
     </div>
 
     <div id="authOverlay">
@@ -123,8 +123,8 @@
         </div>
 
         <div id="screen-setup" class="app-screen card">
-            <h2 style="text-align: center; font-size: 32px;">Trình Bóc Tách Đề V10 (Sạch 100%)</h2>
-            <p style="text-align: center; color: var(--text-muted); margin-bottom: 30px; font-weight: 600;">Hủy diệt mọi mã HTML rác, tự động bẻ gãy đáp án dính hàng chữ.</p>
+            <h2 style="text-align: center; font-size: 32px;">Trình Bóc Tách Đề V11 (Fullstack)</h2>
+            <p style="text-align: center; color: var(--text-muted); margin-bottom: 30px; font-weight: 600;">Được cấp sức mạnh bởi máy chủ Python, diệt gọn mọi lỗi định dạng.</p>
             
             <div class="upload-area" onclick="document.getElementById('fileUpload').click()">
                 <i class="fa-solid fa-file-word"></i>
@@ -138,7 +138,7 @@
             </div>
             
             <div style="display: flex; gap: 15px;">
-                <button class="btn" style="flex: 2; padding: 18px; font-size: 18px;" onclick="processFile('regex')"><i class="fa-solid fa-bolt"></i> QUÉT NHANH BẰNG THUẬT TOÁN</button>
+                <button class="btn" style="flex: 2; padding: 18px; font-size: 18px;" onclick="processFile('regex')"><i class="fa-solid fa-server"></i> QUÉT CHUẨN AZOTA (DÙNG PYTHON)</button>
                 <button class="btn btn-outline" style="flex: 1; padding: 18px; border-color: #8b5cf6; color: #8b5cf6;" onclick="processFile('ai')"><i class="fa-solid fa-robot"></i> DÙNG AI (PDF/ẢNH)</button>
             </div>
         </div>
@@ -238,32 +238,20 @@
         };
 
         // =================================================================
-        // 🔥 ĐỘNG CƠ V10 (THE ULTIMATE CLEANER)
-        // HỦY DIỆT MỌI RÁC HTML (<br>, <b>) VÀ CHẶT DÒNG KHÔNG KHOAN NHƯỢNG
+        // 🔥 ĐỘNG CƠ CẮT DÒNG - XỬ LÝ TEXT TỪ MÁY CHỦ PYTHON TRẢ VỀ
         // =================================================================
-        function parseWordToExamRaw(htmlString) {
+        function parseWordToExamRaw(rawText) {
             let items = [];
             
-            // 1. Chuyển thẻ In đậm sang dạng an toàn
-            let processed = htmlString
-                .replace(/<strong[^>]*>(.*?)<\/strong>/gi, '[[B]]$1[[/B]]')
-                .replace(/<b[^>]*>(.*?)<\/b>/gi, '[[B]]$1[[/B]]')
-                .replace(/<u[^>]*>(.*?)<\/u>/gi, '[[U]]$1[[/U]]');
+            // Xóa rác ZWSP
+            let cleanText = rawText.replace(/[\u200B-\u200D\uFEFF]/g, '');
 
-            // 2. Ép các block element thành dấu xuống dòng (\n)
-            processed = processed.replace(/<\/(p|div|li|tr|h[1-6])>/gi, '\n');
-            processed = processed.replace(/<br\s*\/?>/gi, '\n');
+            // CHẶT DÒNG BẠO CHÚA (Dù dính sát vào nhau vẫn chặt đứt)
+            cleanText = cleanText.replace(/((?:Câu|Bài|Question)\s*\d+[\.\:\)]?)/gi, '\n$1');
+            cleanText = cleanText.replace(/(\*?\s*(?:\[\[[BU]\]\])?\s*[A-D][\.\:\)]\s+)/gi, '\n$1');
+            cleanText = cleanText.replace(/(\*?\s*(?:\[\[[BU]\]\])?\s*[a-d]\)\s+)/gi, '\n$1');
 
-            // 3. DIỆT RÁC HTML TẬN GỐC (Trị dứt điểm vụ hiện <b hay <br>)
-            processed = processed.replace(/<[^>]+>/g, ''); 
-            processed = processed.replace(/&nbsp;/g, ' ').replace(/[\u200B-\u200D\uFEFF]/g, '');
-
-            // 4. CHẶT DÒNG BẠO CHÚA (Dù dính sát vào nhau vẫn chặt đứt)
-            processed = processed.replace(/((?:Câu|Bài|Question)\s*\d+[\.\:\)]?)/gi, '\n$1');
-            processed = processed.replace(/(\*?\s*(?:\[\[[BU]\]\])?\s*[A-D][\.\:\)]\s+)/gi, '\n$1');
-            processed = processed.replace(/(\*?\s*(?:\[\[[BU]\]\])?\s*[a-d]\)\s+)/gi, '\n$1');
-
-            let lines = processed.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            let lines = cleanText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
             let currentItem = null;
 
             for (let line of lines) {
@@ -277,7 +265,6 @@
 
                 if (/^(Câu|Bài|Question)\s*\d+/i.test(pureText)) {
                     if (currentItem) items.push(currentItem);
-                    // Lưu câu hỏi đã được rửa sạch
                     currentItem = { type: 'mcq', text: pureText, options: [] }; 
                     continue;
                 }
@@ -311,13 +298,11 @@
 
                     // DỌN SẠCH CHỮ RÁC CHO UI HỌC SINH
                     let cleanContent = content.replace(/\[\[\/?(?:B|U)\]\]/gi, '').trim();
-                    // Đề phòng sót <br> text
-                    cleanContent = cleanContent.replace(/<br\s*\/?>/gi, '').replace(/<b\s*/gi, '').trim();
 
                     currentItem.options.push({ label, text: cleanContent, isCorrect, tfState, rawLine: line });
                 } 
                 else if (currentItem) {
-                    let cleanCont = pureText.replace(/<br\s*\/?>/gi, '').replace(/<b\s*/gi, '').trim();
+                    let cleanCont = pureText;
                     if (cleanCont) {
                         if (currentItem.options.length === 0) currentItem.text += '\n' + cleanCont;
                         else currentItem.options[currentItem.options.length - 1].text += ' ' + cleanCont;
@@ -386,40 +371,90 @@
 
         document.getElementById('btnLogout').onclick = () => signOut(auth);
 
-        // --- XỬ LÝ FILE ---
-        window.processFile = function(mode) {
-            let file = document.getElementById('fileUpload').files[0];
-            if (!file) return Swal.fire("Lỗi", "Bạn chưa tải file!", "warning");
+        // =======================================================
+        // 🔥 XỬ LÝ FILE: GỌI MÁY CHỦ PYTHON & FALLBACK BẰNG JS
+        // =======================================================
+        window.processFile = async function(mode) {
+            let fileInput = document.getElementById('fileUpload');
+            let file = fileInput.files[0];
+            if (!file) return Swal.fire("Lỗi", "Bạn chưa tải file lên!", "warning");
             
             rawData.title = document.getElementById('examName').value || "Đề Kiểm Tra";
             rawData.time = parseInt(document.getElementById('examTime').value) || 45;
 
-            document.getElementById('loadingOverlay').style.display = 'flex';
-            
+            // Xử lý nút AI Gemini
             if (mode === 'ai') {
-                Swal.fire("Lỗi", "Chức năng AI tạm khóa để tối ưu. Vui lòng dùng Quét thuật toán.", "info");
-                document.getElementById('loadingOverlay').style.display = 'none';
+                if (file.name.endsWith('.docx')) {
+                    return Swal.fire("Lưu ý", "Đề Word hãy bấm nút Quét thuật toán. AI chỉ dùng cho PDF/Ảnh.", "info");
+                }
+                document.getElementById('loadingOverlay').style.display = 'flex';
+                document.getElementById('loadingText').innerText = "Kích hoạt AI Gemini...";
+                let reader = new FileReader();
+                reader.onload = function(e) { goiAIBocTach({ type: "media", content: e.target.result.split(',')[1], mimeType: file.type }); };
+                reader.readAsDataURL(file);
                 return;
             }
 
             if (!file.name.endsWith('.docx')) {
-                document.getElementById('loadingOverlay').style.display = 'none';
-                return Swal.fire("Sai định dạng", "Hỗ trợ file Word (.docx).", "error");
+                return Swal.fire("Sai định dạng", "Chế độ quét máy chủ chỉ hỗ trợ file Word (.docx).", "error");
             }
 
-            let reader = new FileReader();
-            reader.onload = function(e) {
-                mammoth.convertToHtml({arrayBuffer: e.target.result})
-                .then(result => {
-                    let extracted = parseWordToExamRaw(result.value);
-                    document.getElementById('loadingOverlay').style.display = 'none';
-                    
-                    if(extracted.length === 0) return Swal.fire("Lỗi Cấu Trúc", "Đảm bảo đề có 'Câu 1:'", "error");
-                    rawData.items = extracted; showPreview();
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            document.getElementById('loadingText').innerText = "Máy chủ Python đang phân tích lõi Word...";
+
+            let formData = new FormData();
+            formData.append("file", file);
+
+            try {
+                // GỌI MÁY CHỦ PYTHON VERCEL (api/parse.py)
+                const response = await fetch('/api/parse', {
+                    method: 'POST',
+                    body: formData
                 });
-            };
-            reader.readAsArrayBuffer(file);
+                
+                const result = await response.json();
+                
+                if(result.error) throw new Error(result.error);
+                
+                // Nhận Data Text Sạch từ Python
+                let pureText = result.data;
+                let extracted = parseWordToExamRaw(pureText);
+                
+                document.getElementById('loadingOverlay').style.display = 'none';
+                if(extracted.length === 0) return Swal.fire("Lỗi Cấu Trúc", "Đảm bảo đề có 'Câu 1:'", "error");
+                
+                rawData.items = extracted; 
+                showPreview();
+                
+            } catch (err) {
+                // CHẾ ĐỘ DỰ PHÒNG (FALLBACK): Nếu Python trên Vercel chưa được deploy hoặc lỗi, tự động dùng JS Mammoth quét luôn!
+                console.log("Máy chủ Python bận, tự động chuyển sang JS:", err);
+                document.getElementById('loadingText').innerText = "Máy chủ bận, chuyển sang chế độ cắt dự phòng...";
+                
+                let reader = new FileReader();
+                reader.onload = function(e) {
+                    mammoth.convertToHtml({arrayBuffer: e.target.result})
+                    .then(res => {
+                        let extracted = parseWordToExamRaw(res.value);
+                        document.getElementById('loadingOverlay').style.display = 'none';
+                        if(extracted.length === 0) return Swal.fire("Lỗi Cấu Trúc", "Đảm bảo đề có 'Câu 1:'", "error");
+                        rawData.items = extracted; showPreview();
+                    });
+                };
+                reader.readAsArrayBuffer(file);
+            }
         };
+
+        async function goiAIBocTach(payload) {
+            try {
+                const res = await fetch('/api/tach-de', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
+                const data = await res.json();
+                if(data.error) throw new Error(data.error);
+                rawData.items = data;
+                showPreview();
+            } catch (e) { Swal.fire("Lỗi kết nối AI", e.message, "error"); }
+            finally { document.getElementById('loadingOverlay').style.display = 'none'; }
+        }
 
         // --- CHỈNH SỬA UI AZOTA ---
         window.setMCQCorrect = function(qIdx, optIdx) {
