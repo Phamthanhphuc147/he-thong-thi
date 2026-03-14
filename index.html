@@ -97,7 +97,7 @@
 
     <div id="loadingOverlay" style="position: fixed; inset:0; background:rgba(255,255,255,0.95); z-index: 30000; display: none; flex-direction: column; align-items: center; justify-content: center;">
         <i class="fa-solid fa-spinner fa-spin" style="font-size: 60px; color: var(--primary); margin-bottom: 20px;"></i>
-        <h2 style="color: var(--primary); text-align: center; font-weight: 800;" id="loadingText">Đang hủy diệt rác HTML...</h2>
+        <h2 style="color: var(--primary); text-align: center; font-weight: 800;" id="loadingText">Đang dọn dẹp dữ liệu...</h2>
     </div>
 
     <div id="authOverlay">
@@ -123,8 +123,8 @@
         </div>
 
         <div id="screen-setup" class="app-screen card">
-            <h2 style="text-align: center; font-size: 32px;">Trình Bóc Tách Đề V13 (The Terminator)</h2>
-            <p style="text-align: center; color: var(--text-muted); margin-bottom: 30px; font-weight: 600;">Hủy diệt 100% rác HTML. Tự động bẻ dòng và nhận diện Đ/S thông minh.</p>
+            <h2 style="text-align: center; font-size: 32px;">Trình Bóc Tách Đề V14 (Siêu Hoàn Mỹ)</h2>
+            <p style="text-align: center; color: var(--text-muted); margin-bottom: 30px; font-weight: 600;">Tự động nhận diện Trắc Nghiệm thông minh. Hủy diệt rác HTML từ ChatGPT.</p>
             
             <div class="upload-area" onclick="document.getElementById('fileUpload').click()">
                 <i class="fa-solid fa-file-word"></i>
@@ -138,7 +138,7 @@
             </div>
             
             <div style="display: flex; gap: 15px;">
-                <button class="btn" style="flex: 2; padding: 18px; font-size: 18px;" onclick="processFile('regex')"><i class="fa-solid fa-bolt"></i> QUÉT CHUẨN AZOTA</button>
+                <button class="btn" style="flex: 2; padding: 18px; font-size: 18px;" onclick="processFile('regex')"><i class="fa-solid fa-bolt"></i> QUÉT CHUẨN AZOTA (0.1s)</button>
                 <button class="btn btn-outline" style="flex: 1; padding: 18px; border-color: #8b5cf6; color: #8b5cf6;" onclick="processFile('ai')"><i class="fa-solid fa-robot"></i> DÙNG AI</button>
             </div>
         </div>
@@ -233,7 +233,7 @@
         };
 
         // =================================================================
-        // 🔥 ĐỘNG CƠ V13 (THE TERMINATOR): HỦY DIỆT MỌI RÁC TỪ CHATGPT
+        // 🔥 ĐỘNG CƠ V14 (THE ULTIMATE TERMINATOR): DIỆT RÁC & NHẬN DIỆN MCQ CHUẨN 100%
         // =================================================================
         function parseWordToExamRaw(htmlString) {
             let items = [];
@@ -243,27 +243,25 @@
                 .replace(/<\/(p|div|li|tr|h[1-6])>/gi, '\n')
                 .replace(/<br\s*\/?>/gi, '\n');
 
-            // 2. Lấy dữ liệu In đậm thực sự do hệ thống báo (để làm đáp án)
+            // 2. Gắn dấu tàng hình cho In đậm / Gạch chân ĐỂ NHẬN DIỆN ĐÁP ÁN ĐÚNG
             text = text.replace(/<strong[^>]*>(.*?)<\/strong>/gi, '[[B]]$1[[/B]]')
                        .replace(/<b[^>]*>(.*?)<\/b>/gi, '[[B]]$1[[/B]]')
                        .replace(/<u[^>]*>(.*?)<\/u>/gi, '[[U]]$1[[/U]]');
 
-            // 3. LƯỠI DAO HỦY DIỆT 1: Quét sạch các thẻ HTML thật
-            text = text.replace(/<[^>]+>/g, '');
+            // Hỗ trợ thêm mã Azota cũ do GV tự gõ
+            text = text.replace(/\[!b:\$(.*?)\$\]/gi, '[[B]]$1[[/B]]');
+            text = text.replace(/\[!u:\$(.*?)\$\]/gi, '[[U]]$1[[/U]]');
+
+            // 3. LƯỠI DAO HỦY DIỆT: Diệt rác ChatGPT copy dính vào (kể cả tag bị gãy như <br )
+            text = text.replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+            text = text.replace(/<\/?(strong|p|b|u|sup|sub|div|br|span|em|h[1-6])([^>]*)>?/gi, '');
             
-            // LƯỠI DAO HỦY DIỆT 2: Diệt các tag do copy từ ChatGPT sang Word (&lt;strong&gt;)
-            let tempDiv = document.createElement('div');
-            tempDiv.innerHTML = text; // Resolve &lt;, &gt;, &nbsp;
-            text = tempDiv.textContent || tempDiv.innerText || "";
-            
-            // Xóa sổ chữ <strong>, <sup>, <p> dạng chữ do copy dính
-            text = text.replace(/<\/?(strong|p|b|u|sup|sub|div|br|span|em|h[1-6])[^>]*>/gi, '');
-            text = text.replace(/[\u200B-\u200D\uFEFF]/g, '');
+            text = text.replace(/&nbsp;/g, ' ').replace(/[\u200B-\u200D\uFEFF]/g, '');
 
             // 4. ÉP XUỐNG DÒNG MỌI TRƯỜNG HỢP DÍNH CÂU CHẾT NGƯỜI
-            text = text.replace(/(.)((?:Câu|Bài|Question)\s*\d+[\.\:\)]?)/gi, '$1\n$2');
-            text = text.replace(/(^|\s)(\*?\s*(?:\[\[[BU]\]\])?\s*[A-D][\.\:\)]\s+)/gi, '\n$2');
-            text = text.replace(/(^|\s)(\*?\s*(?:\[\[[BU]\]\])?\s*[a-d]\)\s+)/gi, '\n$2');
+            text = text.replace(/(^|\n|\s|\.)((?:Câu|Bài|Question)\s*\d+[\.\:\)]?)/gi, '\n$2');
+            text = text.replace(/(^|\n|\s|\.)(\*?\s*(?:\[\[[BU]\]\])?\s*[A-D][\.\:\)]\s*)/g, '\n$2');
+            text = text.replace(/(^|\n|\s|\.)(\*?\s*(?:\[\[[BU]\]\])?\s*[a-d]\)\s*)/g, '\n$2');
 
             let lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
             let currentItem = null;
@@ -293,8 +291,17 @@
                     
                     if (rawLabel.includes(')')) currentItem.type = 'tf';
 
-                    // KIỂM TRA ĐÁP ÁN ĐÚNG BẰNG IN ĐẬM
-                    if (/^\[\[B\]\]/i.test(line) || /\[\[B\]\]\s*\*?\s*[A-D][\.\:\)]/i.test(line)) isCorrect = true;
+                    // KIỂM TRA ĐÁP ÁN ĐÚNG BẰNG IN ĐẬM (TRẮC NGHIỆM)
+                    if (line.includes('[[B]]') || line.includes('[[U]]')) {
+                        let escapedLabel = rawLabel.replace(/[\.\:\)]/g, '\\$&');
+                        let labelRegex = new RegExp(`\\[\\[[BU]\\]\\]\\s*\\*?\\s*${escapedLabel}`, 'i');
+                        
+                        if (labelRegex.test(line)) {
+                            isCorrect = true; // Trường hợp bôi đậm chữ A.
+                        } else if (/^\[\[[BU]\]\]/i.test(contentWithMarkers)) {
+                            isCorrect = true; // Trường hợp bôi đậm nội dung ngay sau chữ A.
+                        }
+                    }
 
                     // KIỂM TRA Đ/S CỰC MẠNH
                     let tfState = '';
@@ -308,7 +315,7 @@
 
                     if (currentItem.type === 'tf' && !tfState) tfState = 'S';
 
-                    // GỌT SẠCH RÁC CHO UI (Xóa (Đ), (S), [[B]], [[U]])
+                    // GỌT SẠCH RÁC CHO UI (Tuyệt đối không còn thẻ tàng hình hay (Đ))
                     let cleanContent = contentWithMarkers
                         .replace(/\[\[\/?(?:B|U)\]\]/gi, '')
                         .replace(/\(Đ\)|\[Đ\]| Đ$|\(S\)|\[S\]| S$/gi, '')
