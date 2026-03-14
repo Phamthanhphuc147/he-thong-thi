@@ -97,7 +97,7 @@
 
     <div id="loadingOverlay" style="position: fixed; inset:0; background:rgba(255,255,255,0.95); z-index: 30000; display: none; flex-direction: column; align-items: center; justify-content: center;">
         <i class="fa-solid fa-spinner fa-spin" style="font-size: 60px; color: var(--primary); margin-bottom: 20px;"></i>
-        <h2 style="color: var(--primary); text-align: center; font-weight: 800;" id="loadingText">Đang bóc tách dữ liệu...</h2>
+        <h2 style="color: var(--primary); text-align: center; font-weight: 800;" id="loadingText">Đang dọn dẹp dữ liệu...</h2>
     </div>
 
     <div id="authOverlay">
@@ -123,13 +123,12 @@
         </div>
 
         <div id="screen-setup" class="app-screen card">
-            <h2 style="text-align: center; font-size: 32px;">Trình Bóc Tách Đề V9 (Bản Hoàn Mỹ)</h2>
-            <p style="text-align: center; color: var(--text-muted); margin-bottom: 30px; font-weight: 600;">Động cơ cắt dòng tàn bạo: Ép nhận diện 100% câu hỏi dính chùm, bất chấp mọi lỗi form.</p>
+            <h2 style="text-align: center; font-size: 32px;">Trình Bóc Tách Đề V10 (Sạch 100%)</h2>
+            <p style="text-align: center; color: var(--text-muted); margin-bottom: 30px; font-weight: 600;">Hủy diệt mọi mã HTML rác, tự động bẻ gãy đáp án dính hàng chữ.</p>
             
             <div class="upload-area" onclick="document.getElementById('fileUpload').click()">
                 <i class="fa-solid fa-file-word"></i>
                 <h3 id="fileNameDisplay" style="color: var(--text-main); font-size: 22px; margin-bottom: 5px;">Tải đề thi (.docx) lên đây</h3>
-                <p style="color: var(--text-muted); font-size: 14px; font-weight: 600;">Kéo thả file vào đây. Chấp nhận các file dính lỗi hàng ngang.</p>
                 <input type="file" id="fileUpload" accept=".docx, .pdf, image/*" style="display: none;" onchange="document.getElementById('fileNameDisplay').innerText = this.files[0].name">
             </div>
             
@@ -139,7 +138,8 @@
             </div>
             
             <div style="display: flex; gap: 15px;">
-                <button class="btn" style="flex: 2; padding: 18px; font-size: 18px;" onclick="processFile('regex')"><i class="fa-solid fa-bolt"></i> QUÉT CHUẨN AZOTA (0.1s)</button>
+                <button class="btn" style="flex: 2; padding: 18px; font-size: 18px;" onclick="processFile('regex')"><i class="fa-solid fa-bolt"></i> QUÉT NHANH BẰNG THUẬT TOÁN</button>
+                <button class="btn btn-outline" style="flex: 1; padding: 18px; border-color: #8b5cf6; color: #8b5cf6;" onclick="processFile('ai')"><i class="fa-solid fa-robot"></i> DÙNG AI (PDF/ẢNH)</button>
             </div>
         </div>
 
@@ -222,7 +222,7 @@
 
         let isLoginMode = true; let currentUser = null; let currentUserName = "Khách";
         let rawData = { title: "", time: 45, items: [] };
-        let currentExamId = null; 
+        let currentExamId = null;
 
         if (!sessionStorage.getItem('rgbIntroShown')) {
             setTimeout(() => { 
@@ -237,121 +237,107 @@
             window.scrollTo(0,0);
         };
 
-        // =================================================================================
-        // 🔥 ĐỘNG CƠ V9.0 (THE MONEY MAKER): ÉP XUỐNG DÒNG MỌI CẤU TRÚC, FIX LỖI TICK 4 Ô
-        // =================================================================================
+        // =================================================================
+        // 🔥 ĐỘNG CƠ V10 (THE ULTIMATE CLEANER)
+        // HỦY DIỆT MỌI RÁC HTML (<br>, <b>) VÀ CHẶT DÒNG KHÔNG KHOAN NHƯỢNG
+        // =================================================================
         function parseWordToExamRaw(htmlString) {
             let items = [];
             
-            // 1. CHUYỂN ĐỔI THẺ HTML SANG TAG TÀNG HÌNH (Chuẩn Azota)
-            let html = htmlString
-                .replace(/<strong[^>]*>/gi, '<b>').replace(/<\/strong>/gi, '</b>')
-                .replace(/<p[^>]*>/gi, '<br>').replace(/<\/p>/gi, '<br>')
-                .replace(/<div[^>]*>/gi, '<br>').replace(/<\/div>/gi, '<br>')
-                .replace(/<tr[^>]*>/gi, '<br>').replace(/<\/tr>/gi, '<br>')
-                .replace(/<li[^>]*>/gi, '<br>').replace(/<\/li>/gi, '<br>');
+            // 1. Chuyển thẻ In đậm sang dạng an toàn
+            let processed = htmlString
+                .replace(/<strong[^>]*>(.*?)<\/strong>/gi, '[[B]]$1[[/B]]')
+                .replace(/<b[^>]*>(.*?)<\/b>/gi, '[[B]]$1[[/B]]')
+                .replace(/<u[^>]*>(.*?)<\/u>/gi, '[[U]]$1[[/U]]');
 
-            // 2. ÉP XUỐNG DÒNG (THỦ THUẬT QUAN TRỌNG NHẤT)
-            // Tìm và chèn <br> ngay trước các chữ A. B. C. D. và a) b) c) d) dù nó nằm ở đâu
-            let forcedBreakHtml = html.replace(/(^|[\s>&])(\*?(?:<b>|<u>)?\s*[A-D][\.\:]\s+|\*?(?:<b>|<u>)?\s*[a-d]\)\s+)/gi, '<br>$2');
-            
-            // Ép xuống dòng trước Câu X:
-            forcedBreakHtml = forcedBreakHtml.replace(/(^|[\s>&])((?:Câu|Bài|Question)\s*\d+[\.\:\)]?\s+)/gi, '<br>$2');
+            // 2. Ép các block element thành dấu xuống dòng (\n)
+            processed = processed.replace(/<\/(p|div|li|tr|h[1-6])>/gi, '\n');
+            processed = processed.replace(/<br\s*\/?>/gi, '\n');
 
-            // 3. Tách thành mảng theo thẻ <br>
-            let div = document.createElement('div');
-            div.innerHTML = forcedBreakHtml;
-            let rawLines = div.innerHTML.split(/<br\s*\/?>/i);
+            // 3. DIỆT RÁC HTML TẬN GỐC (Trị dứt điểm vụ hiện <b hay <br>)
+            processed = processed.replace(/<[^>]+>/g, ''); 
+            processed = processed.replace(/&nbsp;/g, ' ').replace(/[\u200B-\u200D\uFEFF]/g, '');
 
+            // 4. CHẶT DÒNG BẠO CHÚA (Dù dính sát vào nhau vẫn chặt đứt)
+            processed = processed.replace(/((?:Câu|Bài|Question)\s*\d+[\.\:\)]?)/gi, '\n$1');
+            processed = processed.replace(/(\*?\s*(?:\[\[[BU]\]\])?\s*[A-D][\.\:\)]\s+)/gi, '\n$1');
+            processed = processed.replace(/(\*?\s*(?:\[\[[BU]\]\])?\s*[a-d]\)\s+)/gi, '\n$1');
+
+            let lines = processed.split('\n').map(l => l.trim()).filter(l => l.length > 0);
             let currentItem = null;
 
-            for (let line of rawLines) {
-                // Lọc sạch thẻ để lấy text thuần kiểm tra logic
-                let textNoTags = line.replace(/<[^>]+>/g, '').trim();
-                // Phá mã HTML entities (VD &nbsp;)
-                let txtNode = document.createElement('textarea');
-                txtNode.innerHTML = textNoTags;
-                textNoTags = txtNode.value.replace(/[\u200B-\u200D\uFEFF]/g, '').trim();
+            for (let line of lines) {
+                // Tẩy sạch rác tàng hình để Test
+                let pureText = line.replace(/\[\[\/?(?:B|U)\]\]/gi, '').trim();
 
-                if (!textNoTags) continue;
-
-                // KIỂM TRA PHẦN
-                if (/^(PHẦN|I\.|II\.|III\.|IV\.|V\.)\s+/i.test(textNoTags)) {
-                    items.push({ type: 'section', text: textNoTags });
+                if (/^(PHẦN|I\.|II\.|III\.|IV\.|V\.)\s+/i.test(pureText)) {
+                    items.push({ type: 'section', text: pureText });
                     currentItem = null; continue;
                 }
 
-                // KIỂM TRA CÂU HỎI
-                if (/^(Câu|Bài|Question)\s*\d+[\.\:\)]?/i.test(textNoTags)) {
+                if (/^(Câu|Bài|Question)\s*\d+/i.test(pureText)) {
                     if (currentItem) items.push(currentItem);
-                    currentItem = { type: 'mcq', text: textNoTags, options: [] };
+                    // Lưu câu hỏi đã được rửa sạch
+                    currentItem = { type: 'mcq', text: pureText, options: [] }; 
                     continue;
                 }
 
-                // KIỂM TRA ĐÁP ÁN (Dùng Regex mạnh nhất)
-                let optRegex = /^(\*?)\s*(?:<[bu]>)*\s*([A-D][\.\:\)]|[a-d]\))(?:\s*<\/[bu]>)*\s*(.*)$/i;
-                let match = line.match(optRegex);
-
-                if (match && currentItem) {
-                    let isStarred = match[1] === '*';
-                    let labelRaw = match[2];
-                    let label = labelRaw.replace(/[\.\:\)]/g, '').toUpperCase();
-                    let contentHTML = match[3];
-
-                    if (labelRaw.includes(')')) currentItem.type = 'tf';
-
+                let optMatch = line.match(/^(\*?)\s*(?:\[\[\/?(?:B|U)\]\]\s*)*([A-D][\.\:\)]|[a-d]\))\s*(.*)$/i);
+                
+                if (optMatch && currentItem) {
+                    let isStarred = optMatch[1] === '*';
+                    let rawLabel = optMatch[2]; 
+                    let label = rawLabel.replace(/[\.\:\)]/g, '').trim().toUpperCase();
+                    let content = optMatch[3].trim();
                     let isCorrect = isStarred;
+                    
+                    if (rawLabel.includes(')')) currentItem.type = 'tf';
+
+                    // KIỂM TRA BÔI ĐẬM
+                    if (/^\[\[B\]\]/i.test(line) || /\[\[B\]\]\s*\*?\s*[A-D][\.\:\)]/i.test(line)) isCorrect = true;
+
+                    // KIỂM TRA (Đ)/(S)
                     let tfState = '';
-
-                    // LỌC ĐÁP ÁN ĐÚNG CỰC KỲ KHẮT KHE CHỐNG LỖI TICK 4 CÂU
-                    // CÁCH 1: Bôi đậm đúng cái chữ A. (VD: <b>A.</b>)
-                    let escapedLabel = labelRaw.replace(/[\.\:\)]/g, '\\$&');
-                    let labelBoldRegex = new RegExp(`<b>\\s*\\*?\\s*${escapedLabel}`, 'i');
-                    if (labelBoldRegex.test(line)) isCorrect = true;
-
-                    // CÁCH 2: Quét chữ (Đ) hoặc (S)
-                    let contentTextOnly = contentHTML.replace(/<[^>]+>/g, '');
-                    if (/\(Đ\)|\[Đ\]|\bĐ\b/i.test(contentTextOnly) || contentHTML.includes('<b>Đ</b>')) {
+                    let contentUpper = content.replace(/\[\[\/?(?:B|U)\]\]/gi, '').toUpperCase();
+                    if (contentUpper.includes('(Đ)') || contentUpper.includes('[Đ]') || contentUpper.endsWith(' Đ')) {
                         isCorrect = true; tfState = 'Đ';
-                        contentHTML = contentHTML.replace(/\(Đ\)|\[Đ\]|\bĐ\b|<b>Đ<\/b>/gi, '');
-                    } else if (/\(S\)|\[S\]|\bS\b/i.test(contentTextOnly) || contentHTML.includes('<b>S</b>')) {
+                        content = content.replace(/\(Đ\)|\[Đ\]| Đ$/gi, '');
+                    } else if (contentUpper.includes('(S)') || contentUpper.includes('[S]') || contentUpper.endsWith(' S')) {
                         isCorrect = false; tfState = 'S';
-                        contentHTML = contentHTML.replace(/\(S\)|\[S\]|\bS\b|<b>S<\/b>/gi, '');
+                        content = content.replace(/\(S\)|\[S\]| S$/gi, '');
                     }
 
                     if (currentItem.type === 'tf' && !tfState) tfState = 'S';
 
-                    // LÀM SẠCH HIỂN THỊ
-                    let cleanContent = contentHTML.replace(/<[^>]+>/g, '').trim();
-                    
-                    // Xóa nốt rác của Azota [!b:$...] do giáo viên copy dính vào
-                    cleanContent = cleanContent.replace(/\[![a-z]+:\$(.*?)\$\]/gi, '$1').trim();
+                    // DỌN SẠCH CHỮ RÁC CHO UI HỌC SINH
+                    let cleanContent = content.replace(/\[\[\/?(?:B|U)\]\]/gi, '').trim();
+                    // Đề phòng sót <br> text
+                    cleanContent = cleanContent.replace(/<br\s*\/?>/gi, '').replace(/<b\s*/gi, '').trim();
 
-                    currentItem.options.push({ label, text: cleanContent, isCorrect, tfState, rawHtml: line });
+                    currentItem.options.push({ label, text: cleanContent, isCorrect, tfState, rawLine: line });
                 } 
                 else if (currentItem) {
-                    // Dòng thường nối tiếp
-                    let cleanCont = textNoTags.replace(/\[![a-z]+:\$(.*?)\$\]/gi, '$1');
-                    if (currentItem.options.length === 0) currentItem.text += '\n' + cleanCont;
-                    else currentItem.options[currentItem.options.length - 1].text += ' ' + cleanCont;
+                    let cleanCont = pureText.replace(/<br\s*\/?>/gi, '').replace(/<b\s*/gi, '').trim();
+                    if (cleanCont) {
+                        if (currentItem.options.length === 0) currentItem.text += '\n' + cleanCont;
+                        else currentItem.options[currentItem.options.length - 1].text += ' ' + cleanCont;
+                    }
                 }
             }
             if (currentItem) items.push(currentItem);
 
-            // =======================================================
-            // LUẬT THÉP 1 ĐÁP ÁN: Quét lại 1 lần cuối để chống lỗi
-            // =======================================================
+            // LUẬT THÉP: 1 CÂU HỎI CHỈ 1 ĐÁP ÁN ĐÚNG
             items.forEach(item => {
                 if (item.type === 'mcq') {
                     let corrects = item.options.filter(o => o.isCorrect);
                     if (corrects.length > 1) {
-                        let hasStar = corrects.some(o => o.rawHtml.includes('*'));
+                        let hasStar = corrects.some(o => o.rawLine.includes('*'));
                         let kept = false;
                         item.options.forEach(o => {
                             if (o.isCorrect) {
-                                if (hasStar && !o.rawHtml.includes('*')) { o.isCorrect = false; }
-                                else if (!kept) { kept = true; }
-                                else { o.isCorrect = false; }
+                                if (hasStar && !o.rawLine.includes('*')) o.isCorrect = false;
+                                else if (!kept) kept = true;
+                                else o.isCorrect = false;
                             }
                         });
                     }
@@ -409,6 +395,12 @@
             rawData.time = parseInt(document.getElementById('examTime').value) || 45;
 
             document.getElementById('loadingOverlay').style.display = 'flex';
+            
+            if (mode === 'ai') {
+                Swal.fire("Lỗi", "Chức năng AI tạm khóa để tối ưu. Vui lòng dùng Quét thuật toán.", "info");
+                document.getElementById('loadingOverlay').style.display = 'none';
+                return;
+            }
 
             if (!file.name.endsWith('.docx')) {
                 document.getElementById('loadingOverlay').style.display = 'none';
@@ -417,12 +409,12 @@
 
             let reader = new FileReader();
             reader.onload = function(e) {
-                mammoth.convertToHtml({arrayBuffer: e.target.result}, { styleMap: ["b => b", "strong => b", "u => u"] })
+                mammoth.convertToHtml({arrayBuffer: e.target.result})
                 .then(result => {
                     let extracted = parseWordToExamRaw(result.value);
                     document.getElementById('loadingOverlay').style.display = 'none';
                     
-                    if(extracted.length === 0) return Swal.fire("Lỗi", "Đảm bảo đề có 'Câu 1:'", "error");
+                    if(extracted.length === 0) return Swal.fire("Lỗi Cấu Trúc", "Đảm bảo đề có 'Câu 1:'", "error");
                     rawData.items = extracted; showPreview();
                 });
             };
