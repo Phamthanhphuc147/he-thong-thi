@@ -12,7 +12,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700;800&family=Fira+Code:wght@700;900&display=swap" rel="stylesheet">
     
     <style>
-        /* GIAO DIỆN CHUẨN AZOTA */
         :root { 
             --primary: #2563eb; --primary-hover: #1d4ed8; 
             --secondary: #0ea5e9; 
@@ -123,8 +122,8 @@
         </div>
 
         <div id="screen-setup" class="app-screen card">
-            <h2 style="text-align: center; font-size: 32px;">Trình Bóc Tách Đề V16 (Super Engine)</h2>
-            <p style="text-align: center; color: var(--text-muted); margin-bottom: 30px; font-weight: 600;">Tự động phân biệt ưu tiên: MÀU/GẠCH CHÂN > Bôi đậm. Tự động Tick xanh.</p>
+            <h2 style="text-align: center; font-size: 32px;">Trình Bóc Tách Đề V_FINAL</h2>
+            <p style="text-align: center; color: var(--text-muted); margin-bottom: 30px; font-weight: 600;">Hủy diệt 100% rác HTML. Cắt dòng siêu bạo chúa. Nhận diện cực chuẩn.</p>
             
             <div class="upload-area" onclick="document.getElementById('fileUpload').click()">
                 <i class="fa-solid fa-file-word"></i>
@@ -138,8 +137,7 @@
             </div>
             
             <div style="display: flex; gap: 15px;">
-                <button class="btn" style="flex: 2; padding: 18px; font-size: 18px;" onclick="processFile('regex')"><i class="fa-solid fa-bolt"></i> QUÉT CHUẨN AZOTA</button>
-                <button class="btn btn-outline" style="flex: 1; padding: 18px; border-color: #8b5cf6; color: #8b5cf6;" onclick="processFile('ai')"><i class="fa-solid fa-robot"></i> DÙNG AI</button>
+                <button class="btn" style="flex: 2; padding: 18px; font-size: 18px;" onclick="processFile('regex')"><i class="fa-solid fa-bolt"></i> BẮT ĐẦU BÓC TÁCH (SIÊU TỐC)</button>
             </div>
         </div>
 
@@ -150,7 +148,7 @@
             </div>
             
             <div style="background: #eff6ff; border-left: 4px solid #2563eb; padding: 10px 15px; margin-bottom: 15px; color: #1e293b; font-weight: 600; border-radius: 4px;">
-                <i class="fa-solid fa-circle-info" style="color: #2563eb;"></i> Đáp án MÀU/GẠCH CHÂN đã được máy tự động đánh dấu (Tick xanh).
+                <i class="fa-solid fa-circle-info" style="color: #2563eb;"></i> Cấu trúc đã được dọn rác sạch sẽ. Đáp án đúng tự động check xanh.
             </div>
 
             <div id="previewContainer" style="max-height: 550px; overflow-y: auto; padding-right: 10px;"></div>
@@ -233,35 +231,48 @@
         };
 
         // ============================================================================
-        // 🔥 ĐỘNG CƠ V16: CHẤM ĐIỂM TRỌNG SỐ TỪ PYTHON TRẢ VỀ (HL > U > B)
+        // 🔥 ĐỘNG CƠ V_FINAL: KẺ HỦY DIỆT MỌI LOẠI RÁC (HTML, CHATGPT, AZOTA CODE)
         // ============================================================================
         function parseWordToExamRaw(htmlString) {
             let items = [];
             
-            // Xử lý tiền kỳ cho chế độ Fallback Mammoth (nếu Python chết)
+            // 1. CHUYỂN CÁC THẺ KHỐI THÀNH DẤU XUỐNG DÒNG (Tránh dính câu)
             let text = htmlString
                 .replace(/<\/(p|div|li|tr|h[1-6])>/gi, '\n')
                 .replace(/<br\s*\/?>/gi, '\n');
+
+            // 2. BẢO TỒN IN ĐẬM/GẠCH CHÂN BẰNG MÃ RIÊNG (Tránh bị bộ lọc xóa mất)
+            text = text.replace(/<strong[^>]*>(.*?)<\/strong>/gi, '___B___$1___/B___')
+                       .replace(/<b[^>]*>(.*?)<\/b>/gi, '___B___$1___/B___')
+                       .replace(/<u[^>]*>(.*?)<\/u>/gi, '___U___$1___/U___');
+
+            // 3. DAO PHAY DOM: HỦY DIỆT SẠCH SẼ 100% CÁC THẺ HTML CÒN LẠI (<sup>, <span>, <font>...)
+            text = text.replace(/<[^>]+>/g, '');
             
-            // Map thẻ HTML sang thẻ tàng hình nội bộ (Dùng cho Fallback)
-            text = text.replace(/<strong[^>]*>(.*?)<\/strong>/gi, '[[B]]$1[[/B]]')
-                       .replace(/<b[^>]*>(.*?)<\/b>/gi, '[[B]]$1[[/B]]')
-                       .replace(/<u[^>]*>(.*?)<\/u>/gi, '[[U]]$1[[/U]]');
+            // 4. GIẢI MÃ KÝ TỰ ĐẶC BIỆT CỦA HTML (&nbsp;, &lt;, &gt;)
+            let txtNode = document.createElement('textarea');
+            txtNode.innerHTML = text;
+            text = txtNode.value;
+            text = text.replace(/[\u200B-\u200D\uFEFF]/g, ''); // Xóa khoảng trắng tàng hình
 
-            // DIỆT SẠCH RÁC HTML THỪA (SẠCH BÓNG 100%)
-            text = text.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/[\u200B-\u200D\uFEFF]/g, '');
+            // 5. CHUYỂN HÓA MÃ RÁC AZOTA MÀ GIÁO VIÊN COPY VÀO (VD: [!b:$...])
+            text = text.replace(/\[![a-z]+:\s*\[![a-z]+:\s*([A-D][\.\:\)]|[a-d]\))[^\]]*\$\]\s*\$\]/gi, '___B___$1___/B___');
+            text = text.replace(/\[![a-z]+:\s*([A-D][\.\:\)]|[a-d]\))[^\]]*\$\]/gi, '___B___$1___/B___');
+            text = text.replace(/\[![a-z]+:\s*(Đ|S)[^\]]*\$\]/gi, '___B___$1___/B___');
+            text = text.replace(/\[![a-z]+:[^\]]*\$\]/gi, ''); // Xóa mọi mã Azota vô nghĩa khác
 
-            // ÉP XUỐNG DÒNG (CHẶT MỌI CHỖ DÍNH HÀNG CỦA A, B, C, D)
+            // 6. MÁY CHÉM DÒNG TÀN BẠO (TRỊ BỆNH DÍNH HÀNG: Cận cực.B. Ôn đới)
+            // Bất kể trước A, B, C, D là chữ gì, không cần khoảng trắng, chặt đứt đẩy xuống dòng!
             text = text.replace(/([^\n])((?:Câu|Bài|Question)\s*\d+[\.\:\)]?)/gi, '$1\n$2');
-            text = text.replace(/([^\n])(\*?\s*(?:\[\[\/?(?:B|U|HL|I)\]\]\s*)*[A-D][\.\:\)]\s+)/g, '$1\n$2');
-            text = text.replace(/([^\n])(\*?\s*(?:\[\[\/?(?:B|U|HL|I)\]\]\s*)*[a-d]\)\s+)/g, '$1\n$2');
+            text = text.replace(/([^\n])(\s*\*?(?:___[BU]___\s*)*[A-D][\.\:\)])/g, '$1\n$2');
+            text = text.replace(/([^\n])(\s*\*?(?:___[BU]___\s*)*[a-d]\))/g, '$1\n$2');
 
             let lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
             let currentItem = null;
 
             for (let line of lines) {
-                // pureText: Chuỗi hoàn toàn sạch sẽ để soi Logic Câu hỏi
-                let pureText = line.replace(/\[\[\/?(?:B|U|HL|I)\]\]/gi, '').trim();
+                // pureText: Phiên bản trần trụi nhất, không còn dấu vết mã hóa, dùng để test điều kiện
+                let pureText = line.replace(/___\/?(?:B|U)___/g, '').trim();
 
                 if (/^(PHẦN|I\.|II\.|III\.|IV\.|V\.)\s+/i.test(pureText)) {
                     items.push({ type: 'section', text: pureText });
@@ -274,7 +285,7 @@
                     continue;
                 }
 
-                let optMatch = line.match(/^(\*?)\s*(?:\[\[\/?(?:B|U|HL|I)\]\]\s*)*([A-D][\.\:\)]|[a-d]\))\s*(.*)$/i);
+                let optMatch = line.match(/^(\*?)\s*(?:___\/?(?:B|U)___\s*)*([A-D][\.\:\)]|[a-d]\))\s*(.*)$/i);
                 
                 if (optMatch && currentItem) {
                     let isStarred = optMatch[1] === '*';
@@ -284,32 +295,29 @@
                     
                     if (rawLabel.includes(')')) currentItem.type = 'tf';
 
-                    // -------------------------------------------------------------
-                    // 🌟 AI SCORING: CHẤM ĐIỂM DẤU HIỆU TRONG CÂU ĐÁP ÁN
-                    // -------------------------------------------------------------
+                    // 7. THUẬT TOÁN CHẤM ĐIỂM TÌM ĐÁP ÁN (Khắc phục lỗi tick cả 4 đáp án)
                     let score = 0;
-                    if (isStarred) score += 10000;         // * Dấu sao: Tuyệt đối
-                    if (line.includes('[[HL]]')) score += 500; // Highlight / Màu chữ
-                    if (line.includes('[[U]]')) score += 100;  // Gạch chân
-                    if (line.includes('[[B]]')) score += 10;   // Bôi đậm
+                    if (isStarred) score += 10000;
+                    if (line.includes('___U___')) score += 100; // Gạch chân = 100 điểm
+                    if (line.includes('___B___')) score += 10;  // Bôi đậm = 10 điểm
 
                     let tfState = '';
-                    let contentUpper = contentWithMarkers.replace(/\[\[\/?(?:B|U|HL|I)\]\]/gi, '').toUpperCase();
+                    let contentUpper = contentWithMarkers.replace(/___\/?(?:B|U)___/g, '').toUpperCase();
                     
-                    // KIỂM TRA DẠNG ĐÚNG/SAI
-                    if (contentUpper.includes('(Đ)') || contentUpper.includes('[Đ]') || contentUpper.endsWith(' Đ')) {
+                    if (/\b(Đ)\b|\(Đ\)|\[Đ\]/.test(contentUpper) || contentUpper.endsWith(' Đ')) {
                         score += 10000; tfState = 'Đ';
-                    } else if (contentUpper.includes('(S)') || contentUpper.includes('[S]') || contentUpper.endsWith(' S')) {
+                    } else if (/\b(S)\b|\(S\)|\[S\]/.test(contentUpper) || contentUpper.endsWith(' S')) {
                         score += 10000; tfState = 'S';
                     }
 
                     if (currentItem.type === 'tf' && !tfState) tfState = 'S';
 
-                    // GỌT RỬA SẠCH SẼ ĐỂ HIỂN THỊ LÊN UI HỌC SINH (SẠCH TƯNG 100%)
+                    // 8. BỘ LỌC CUỐI TRƯỚC KHI LÊN MÀN HÌNH (Gọt sạch sẽ mọi mã)
                     let cleanContent = contentWithMarkers
-                        .replace(/\[\[\/?(?:B|U|HL|I)\]\]/gi, '')
-                        .replace(/\(Đ\)|\[Đ\]| Đ$|\(S\)|\[S\]| S$/gi, '')
-                        .replace(/^[\.\:\-\s]+/, '').trim();
+                        .replace(/___\/?(?:B|U)___/g, '') // Xóa tag nội bộ
+                        .replace(/\(Đ\)|\[Đ\]| Đ$|\(S\)|\[S\]| S$/gi, '') // Xóa chữ Đ/S
+                        .replace(/^[\.\:\-\s]+/, '') // Gọt dấu chấm thừa ở đầu
+                        .trim();
 
                     currentItem.options.push({ label, text: cleanContent, isCorrect: false, score: score, tfState, rawLine: line });
                 } 
@@ -320,21 +328,19 @@
             }
             if (currentItem) items.push(currentItem);
 
-            // -------------------------------------------------------------
-            // CHỐT KẾT QUẢ TỪ ĐIỂM SỐ (FIX LỖI CHỌN CẢ 4 CÂU A B C D)
-            // -------------------------------------------------------------
+            // 9. QUY TẮC ĐỘC TÔN: CHỈ TICK ĐÚNG 1 ĐÁP ÁN
             items.forEach(item => {
                 if (item.type === 'mcq') {
                     let maxScore = 0;
                     item.options.forEach(o => { if (o.score > maxScore) maxScore = o.score; });
 
                     if (maxScore > 0) {
-                        // NẾU CHỈ CÓ ĐIỂM 10 (Chỉ có bôi đậm), VÀ 4 CÂU ĐỀU BÔI ĐẬM -> Bỏ qua không chọn.
-                        let allBolded = item.options.every(o => o.score >= 10 && o.score < 100);
-                        if (maxScore === 10 && allBolded) {
-                            // Giáo viên trang trí bôi đậm cả 4 câu, máy hiểu nên không chọn bậy bạ.
+                        // Nếu 4 câu đều bôi đậm (Score 10) do lỗi format -> Hủy, không tick câu nào
+                        let countMax = item.options.filter(o => o.score === maxScore).length;
+                        if (maxScore === 10 && countMax > 1) {
+                            // Do nothing
                         } else {
-                            // Chọn duy nhất 1 câu đạt maxScore đầu tiên
+                            // Tick câu có điểm cao nhất đầu tiên tìm thấy
                             let marked = false;
                             item.options.forEach(o => {
                                 if (o.score === maxScore && !marked) {
@@ -345,7 +351,6 @@
                         }
                     }
                 } else if (item.type === 'tf') {
-                    // True False thì giữ nguyên trạng thái Đ/S
                     item.options.forEach(o => { o.isCorrect = (o.tfState === 'Đ'); });
                 }
             });
@@ -393,45 +398,36 @@
         document.getElementById('btnLogout').onclick = () => signOut(auth);
 
         // --- XỬ LÝ FILE ---
-        window.processFile = async function(mode) {
+        window.processFile = async function() {
             let file = document.getElementById('fileUpload').files[0];
             if (!file) return Swal.fire("Lỗi", "Bạn chưa tải file lên!", "warning");
             
+            if (!file.name.endsWith('.docx')) {
+                return Swal.fire("Sai định dạng", "Chỉ hỗ trợ file Word (.docx).", "error");
+            }
+
             rawData.title = document.getElementById('examName').value || "Đề Kiểm Tra";
             rawData.time = parseInt(document.getElementById('examTime').value) || 45;
 
-            if (mode === 'ai') return Swal.fire("Thông báo", "AI đang bảo trì. Hãy dùng nút Quét Thuật Toán (Nhanh & Chuẩn hơn).", "info");
-
             document.getElementById('loadingOverlay').style.display = 'flex';
 
-            let formData = new FormData();
-            formData.append("file", file);
-
-            try {
-                // Gọi API Python (parse.py)
-                const response = await fetch('/api/parse', { method: 'POST', body: formData });
-                const result = await response.json();
-                if(result.error) throw new Error(result.error);
-                
-                let extracted = parseWordToExamRaw(result.data);
-                document.getElementById('loadingOverlay').style.display = 'none';
-                if(extracted.length === 0) return Swal.fire("Lỗi Cấu Trúc", "Đảm bảo đề có 'Câu 1:'", "error");
-                
-                rawData.items = extracted; showPreview();
-            } catch (err) {
-                // FALLBACK MAMMOTH (JS) NẾU PYTHON CHẾT
-                let reader = new FileReader();
-                reader.onload = function(e) {
-                    mammoth.convertToHtml({arrayBuffer: e.target.result}, { styleMap: ["u => u", "b => b", "strong => b", "i => i"] })
-                    .then(res => {
-                        let extracted = parseWordToExamRaw(res.value);
-                        document.getElementById('loadingOverlay').style.display = 'none';
-                        if(extracted.length === 0) return Swal.fire("Lỗi Cấu Trúc", "Đảm bảo đề có 'Câu 1:'", "error");
-                        rawData.items = extracted; showPreview();
-                    });
-                };
-                reader.readAsArrayBuffer(file);
-            }
+            // TRÌNH BÓC TÁCH MAMMOTH LOCAL (CỰC MẠNH - KHÔNG CẦN BACKEND)
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                // Ép mammoth giữ lại thẻ u, b, strong
+                mammoth.convertToHtml({arrayBuffer: e.target.result}, { styleMap: ["u => u", "b => b", "strong => b"] })
+                .then(res => {
+                    let extracted = parseWordToExamRaw(res.value);
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                    if(extracted.length === 0) return Swal.fire("Lỗi Cấu Trúc", "Đảm bảo đề có 'Câu 1:'", "error");
+                    rawData.items = extracted; showPreview();
+                })
+                .catch(err => {
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                    Swal.fire("Lỗi", "Lỗi đọc file: " + err.message, "error");
+                });
+            };
+            reader.readAsArrayBuffer(file);
         };
 
         // --- CHỈNH SỬA UI ---
