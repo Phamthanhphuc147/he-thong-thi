@@ -123,8 +123,8 @@
         </div>
 
         <div id="screen-setup" class="app-screen card">
-            <h2 style="text-align: center; font-size: 32px;">Trình Bóc Tách Đề V15 (Super Engine)</h2>
-            <p style="text-align: center; color: var(--text-muted); margin-bottom: 30px; font-weight: 600;">Thuật toán nhận diện điểm trọng số: Gạch dưới > Bôi đậm. Tự động diệt rác HTML.</p>
+            <h2 style="text-align: center; font-size: 32px;">Trình Bóc Tách Đề V16 (Super Engine)</h2>
+            <p style="text-align: center; color: var(--text-muted); margin-bottom: 30px; font-weight: 600;">Tự động phân biệt ưu tiên: MÀU/GẠCH CHÂN > Bôi đậm. Tự động Tick xanh.</p>
             
             <div class="upload-area" onclick="document.getElementById('fileUpload').click()">
                 <i class="fa-solid fa-file-word"></i>
@@ -150,7 +150,7 @@
             </div>
             
             <div style="background: #eff6ff; border-left: 4px solid #2563eb; padding: 10px 15px; margin-bottom: 15px; color: #1e293b; font-weight: 600; border-radius: 4px;">
-                <i class="fa-solid fa-circle-info" style="color: #2563eb;"></i> Cấu trúc chuẩn Azota. Đáp án đã được máy tự động gạch/tô nhận diện.
+                <i class="fa-solid fa-circle-info" style="color: #2563eb;"></i> Đáp án MÀU/GẠCH CHÂN đã được máy tự động đánh dấu (Tick xanh).
             </div>
 
             <div id="previewContainer" style="max-height: 550px; overflow-y: auto; padding-right: 10px;"></div>
@@ -232,39 +232,36 @@
             window.scrollTo(0,0);
         };
 
-        // =================================================================
-        // 🔥 ĐỘNG CƠ V15 (SCORING ENGINE): NHẬN DIỆN CHÍNH XÁC QUA GẠCH CHÂN
-        // =================================================================
+        // ============================================================================
+        // 🔥 ĐỘNG CƠ V16: CHẤM ĐIỂM TRỌNG SỐ TỪ PYTHON TRẢ VỀ (HL > U > B)
+        // ============================================================================
         function parseWordToExamRaw(htmlString) {
             let items = [];
             
+            // Xử lý tiền kỳ cho chế độ Fallback Mammoth (nếu Python chết)
             let text = htmlString
                 .replace(/<\/(p|div|li|tr|h[1-6])>/gi, '\n')
                 .replace(/<br\s*\/?>/gi, '\n');
-
-            // Bắt In đậm và Gạch chân thành Tag nội bộ
+            
+            // Map thẻ HTML sang thẻ tàng hình nội bộ (Dùng cho Fallback)
             text = text.replace(/<strong[^>]*>(.*?)<\/strong>/gi, '[[B]]$1[[/B]]')
                        .replace(/<b[^>]*>(.*?)<\/b>/gi, '[[B]]$1[[/B]]')
                        .replace(/<u[^>]*>(.*?)<\/u>/gi, '[[U]]$1[[/U]]');
 
-            // Lưỡi dao hủy diệt HTML: Xóa toàn bộ tag thừa (Fix lỗi hiện chữ <p>, <br>)
+            // DIỆT SẠCH RÁC HTML THỪA (SẠCH BÓNG 100%)
             text = text.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/[\u200B-\u200D\uFEFF]/g, '');
-            
-            // Xóa rác Azota nếu có
-            text = text.replace(/\[![a-z]+:\s*\[![a-z]+:\s*([A-D][\.\:\)]|[a-d]\))[^\]]*\$\]\s*\$\]/gi, '[[B]]$1[[/B]]');
-            text = text.replace(/\[![a-z]+:\s*([A-D][\.\:\)]|[a-d]\))[^\]]*\$\]/gi, '[[B]]$1[[/B]]');
-            text = text.replace(/\[![a-z]+:\s*(Đ|S)[^\]]*\$\]/gi, '[[B]]$1[[/B]]');
 
-            // Ép xuống dòng bạo chúa
-            text = text.replace(/(.)((?:Câu|Bài|Question)\s*\d+[\.\:\)]?)/gi, '$1\n$2');
-            text = text.replace(/(\s+|^)(\*?\s*(?:\[\[[BU]\]\])*\s*[A-D][\.\:\)]\s+)/g, '\n$2');
-            text = text.replace(/(\s+|^)(\*?\s*(?:\[\[[BU]\]\])*\s*[a-d]\)\s+)/g, '\n$2');
+            // ÉP XUỐNG DÒNG (CHẶT MỌI CHỖ DÍNH HÀNG CỦA A, B, C, D)
+            text = text.replace(/([^\n])((?:Câu|Bài|Question)\s*\d+[\.\:\)]?)/gi, '$1\n$2');
+            text = text.replace(/([^\n])(\*?\s*(?:\[\[\/?(?:B|U|HL|I)\]\]\s*)*[A-D][\.\:\)]\s+)/g, '$1\n$2');
+            text = text.replace(/([^\n])(\*?\s*(?:\[\[\/?(?:B|U|HL|I)\]\]\s*)*[a-d]\)\s+)/g, '$1\n$2');
 
             let lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
             let currentItem = null;
 
             for (let line of lines) {
-                let pureText = line.replace(/\[\[\/?(?:B|U)\]\]/gi, '').replace(/\[![a-z]+:[^\]]*\$\]/gi, '').replace(/\$\]/g, '').trim();
+                // pureText: Chuỗi hoàn toàn sạch sẽ để soi Logic Câu hỏi
+                let pureText = line.replace(/\[\[\/?(?:B|U|HL|I)\]\]/gi, '').trim();
 
                 if (/^(PHẦN|I\.|II\.|III\.|IV\.|V\.)\s+/i.test(pureText)) {
                     items.push({ type: 'section', text: pureText });
@@ -277,7 +274,7 @@
                     continue;
                 }
 
-                let optMatch = line.match(/^(\*?)\s*(?:\[\[\/?(?:B|U)\]\]\s*)*([A-D][\.\:\)]|[a-d]\))\s*(.*)$/i);
+                let optMatch = line.match(/^(\*?)\s*(?:\[\[\/?(?:B|U|HL|I)\]\]\s*)*([A-D][\.\:\)]|[a-d]\))\s*(.*)$/i);
                 
                 if (optMatch && currentItem) {
                     let isStarred = optMatch[1] === '*';
@@ -287,29 +284,30 @@
                     
                     if (rawLabel.includes(')')) currentItem.type = 'tf';
 
-                    // ---------------------------------------------------------
-                    // 🌟 HỆ THỐNG CHẤM ĐIỂM TRỌNG SỐ (GIẢI QUYẾT LỖI FILE CỦA PHÚC)
-                    // ---------------------------------------------------------
+                    // -------------------------------------------------------------
+                    // 🌟 AI SCORING: CHẤM ĐIỂM DẤU HIỆU TRONG CÂU ĐÁP ÁN
+                    // -------------------------------------------------------------
                     let score = 0;
-                    if (isStarred) score += 100;
-                    if (line.includes('[[U]]')) score += 50; // Gạch dưới được cộng 50đ (Ưu tiên)
-                    if (line.includes('[[B]]')) score += 10; // Bôi đậm chỉ được cộng 10đ
+                    if (isStarred) score += 10000;         // * Dấu sao: Tuyệt đối
+                    if (line.includes('[[HL]]')) score += 500; // Highlight / Màu chữ
+                    if (line.includes('[[U]]')) score += 100;  // Gạch chân
+                    if (line.includes('[[B]]')) score += 10;   // Bôi đậm
 
-                    // KIỂM TRA Đ/S CỦA DẠNG TRUE/FALSE
                     let tfState = '';
-                    let contentUpper = contentWithMarkers.toUpperCase();
-                    if (contentUpper.includes('(Đ)') || contentUpper.includes('[Đ]') || contentUpper.includes('[[B]]Đ[[/B]]') || contentUpper.endsWith(' Đ')) {
-                        score += 100; tfState = 'Đ';
-                    } else if (contentUpper.includes('(S)') || contentUpper.includes('[S]') || contentUpper.includes('[[B]]S[[/B]]') || contentUpper.endsWith(' S')) {
-                        score += 100; tfState = 'S';
+                    let contentUpper = contentWithMarkers.replace(/\[\[\/?(?:B|U|HL|I)\]\]/gi, '').toUpperCase();
+                    
+                    // KIỂM TRA DẠNG ĐÚNG/SAI
+                    if (contentUpper.includes('(Đ)') || contentUpper.includes('[Đ]') || contentUpper.endsWith(' Đ')) {
+                        score += 10000; tfState = 'Đ';
+                    } else if (contentUpper.includes('(S)') || contentUpper.includes('[S]') || contentUpper.endsWith(' S')) {
+                        score += 10000; tfState = 'S';
                     }
 
                     if (currentItem.type === 'tf' && !tfState) tfState = 'S';
 
-                    // Dọn rác trả lại chữ trong trẻo
+                    // GỌT RỬA SẠCH SẼ ĐỂ HIỂN THỊ LÊN UI HỌC SINH (SẠCH TƯNG 100%)
                     let cleanContent = contentWithMarkers
-                        .replace(/\[\[\/?(?:B|U)\]\]/gi, '')
-                        .replace(/\[![a-z]+:[^\]]*\$\]/gi, '').replace(/\$\]/g, '')
+                        .replace(/\[\[\/?(?:B|U|HL|I)\]\]/gi, '')
                         .replace(/\(Đ\)|\[Đ\]| Đ$|\(S\)|\[S\]| S$/gi, '')
                         .replace(/^[\.\:\-\s]+/, '').trim();
 
@@ -322,22 +320,21 @@
             }
             if (currentItem) items.push(currentItem);
 
-            // ---------------------------------------------------------
-            // BỘ LỌC LUẬT THÉP DỰA TRÊN ĐIỂM SỐ
-            // ---------------------------------------------------------
+            // -------------------------------------------------------------
+            // CHỐT KẾT QUẢ TỪ ĐIỂM SỐ (FIX LỖI CHỌN CẢ 4 CÂU A B C D)
+            // -------------------------------------------------------------
             items.forEach(item => {
                 if (item.type === 'mcq') {
-                    // Tìm điểm cao nhất trong 4 câu
-                    let maxScore = -1;
+                    let maxScore = 0;
                     item.options.forEach(o => { if (o.score > maxScore) maxScore = o.score; });
 
                     if (maxScore > 0) {
-                        // Nếu điểm cao nhất chỉ là 10 (chỉ bôi đậm) VÀ cả 4 câu đều bị bôi đậm (do lỗi trang trí của GV)
-                        let allBold = item.options.every(o => o.score >= 10);
-                        if (maxScore === 10 && allBold) {
-                            // Không chọn câu nào cả vì GV trang trí sai cách
+                        // NẾU CHỈ CÓ ĐIỂM 10 (Chỉ có bôi đậm), VÀ 4 CÂU ĐỀU BÔI ĐẬM -> Bỏ qua không chọn.
+                        let allBolded = item.options.every(o => o.score >= 10 && o.score < 100);
+                        if (maxScore === 10 && allBolded) {
+                            // Giáo viên trang trí bôi đậm cả 4 câu, máy hiểu nên không chọn bậy bạ.
                         } else {
-                            // Chọn DUY NHẤT 1 câu có điểm cao nhất
+                            // Chọn duy nhất 1 câu đạt maxScore đầu tiên
                             let marked = false;
                             item.options.forEach(o => {
                                 if (o.score === maxScore && !marked) {
@@ -411,7 +408,7 @@
             formData.append("file", file);
 
             try {
-                // Gọi API Python (Nếu có)
+                // Gọi API Python (parse.py)
                 const response = await fetch('/api/parse', { method: 'POST', body: formData });
                 const result = await response.json();
                 if(result.error) throw new Error(result.error);
@@ -422,10 +419,10 @@
                 
                 rawData.items = extracted; showPreview();
             } catch (err) {
-                // FALLBACK MAMMOTH TẠI TRÌNH DUYỆT
+                // FALLBACK MAMMOTH (JS) NẾU PYTHON CHẾT
                 let reader = new FileReader();
                 reader.onload = function(e) {
-                    mammoth.convertToHtml({arrayBuffer: e.target.result})
+                    mammoth.convertToHtml({arrayBuffer: e.target.result}, { styleMap: ["u => u", "b => b", "strong => b", "i => i"] })
                     .then(res => {
                         let extracted = parseWordToExamRaw(res.value);
                         document.getElementById('loadingOverlay').style.display = 'none';
